@@ -18,7 +18,13 @@
 • Cuando termina la voz, la imagen se oscurece sola para no molestarte.
 
 ⏱️ Capítulos
-[PEGAR AQUÍ output/capitulos_youtube.txt]
+0:00 Bienvenida
+1:46 Respiración lenta
+4:46 Relajar el cuerpo
+12:50 Soltar los pensamientos
+14:45 La cabaña bajo la lluvia
+19:20 Hacia el sueño
+22:00 Lluvia para dormir (sin voz)
 
 Si te ayuda a descansar, suscríbete: subiremos más relajaciones para dormir.
 
@@ -38,7 +44,7 @@ meditación guiada para dormir, relajación para dormir, insomnio, dormir profun
 - **Audiencia:** "No, no es contenido creado para niños".
 - **Idioma del vídeo:** Español. **Categoría:** Estilo y consejos (o Personas y blogs).
 - **Miniatura:** `output/miniatura.png`.
-- **Capítulos:** pega los de `output/capitulos_youtube.txt` en la descripción (el primero debe ser 0:00).
+- **Capítulos:** ya van en la descripción de arriba (si regeneras la voz, cópialos de `output/capitulos_youtube.txt`).
 - **Lista de reproducción:** crea "Meditaciones para dormir" y añádelo.
 - **Hora:** publícalo por la tarde para que esté indexado cuando la gente busca por la noche.
 - **Comentario fijado:** una pregunta sencilla, por ejemplo "¿En qué minuto te quedaste dormido/a? 🌙", que anima a comentar.
