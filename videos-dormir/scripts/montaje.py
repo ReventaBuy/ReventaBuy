@@ -18,6 +18,9 @@ import pyloudnorm as pyln
 from scipy.io import wavfile
 
 SR, LOOP = 48000, 120  # LOOP: duración del bucle de vídeo (s)
+# Calidad (CRF: más alto = más compresión). Ajustado para que 3 h quepan en < 500 MB.
+CRF_CLARO, CRF_TRANSICION, CRF_OSCURO = 24, 26, 32
+AUDIO_KBPS = 128
 OUT = Path(__file__).resolve().parent.parent / "output"
 VOZ_INICIO = 6.0
 LUFS = {"voz": -19.0, "lluvia_con_voz": -30.0, "lluvia_sola": -27.0, "pad": -33.0}
@@ -52,7 +55,7 @@ def audio(dur, voz_wav, salida):
     pad = pad * ganancia(pad, LUFS["pad"])
     fin_voz = VOZ_INICIO + voz.shape[0] / SR
     p = subprocess.Popen(["ffmpeg", "-v", "error", "-y", "-f", "f32le", "-ar", str(SR), "-ac", "2", "-i", "-",
-                          "-c:a", "aac", "-b:a", "192k", str(salida)], stdin=subprocess.PIPE)
+                          "-c:a", "aac", "-b:a", f"{AUDIO_KBPS}k", str(salida)], stdin=subprocess.PIPE)
     trozo = SR * 30
     total = int(dur * SR)
     pico = 0.0
@@ -87,18 +90,19 @@ def video(dur, fin_voz, audio_m4a, salida):
     claras = max(1, math.ceil((fin_voz + 60) / LOOP))
     oscuro = 0.6  # opacidad del negro encima de la imagen después de la voz
     negro = f"color=black:s=1920x1080:r=24:d={LOOP},format=rgba"
-    inicio = variante("inicio", "[0:v]fade=in:st=0:d=4")
-    transicion = variante("transicion", f"{negro},fade=in:st=0:d={LOOP}:alpha=1,colorchannelmixer=aa={oscuro}[n];[0:v][n]overlay", 23)
-    # la parte oscura casi nadie la mira: más compresión, mucho menos peso
-    oscura = variante("oscura", f"{negro},colorchannelmixer=aa={oscuro}[n];[0:v][n]overlay", 25)
+    inicio = variante("inicio", "[0:v]fade=in:st=0:d=4", CRF_CLARO)
+    clara = variante("clara", "[0:v]null", CRF_CLARO)
+    transicion = variante("transicion", f"{negro},fade=in:st=0:d={LOOP}:alpha=1,colorchannelmixer=aa={oscuro}[n];[0:v][n]overlay", CRF_TRANSICION)
+    # la parte oscura casi nadie la mira: mucha más compresión, mucho menos peso
+    oscura = variante("oscura", f"{negro},colorchannelmixer=aa={oscuro}[n];[0:v][n]overlay", CRF_OSCURO)
     ultima = dur - (vueltas - 1) * LOOP
-    final = variante("final", f"{negro},colorchannelmixer=aa={oscuro}[n];[0:v][n]overlay,fade=out:st={max(0, ultima - 60)}:d=60", 25)
-    lista = [inicio] + [OUT / "fondo_loop.mp4"] * (claras - 1) + [transicion] + [oscura] * (vueltas - claras - 2) + [final]
+    final = variante("final", f"{negro},colorchannelmixer=aa={oscuro}[n];[0:v][n]overlay,fade=out:st={max(0, ultima - 60)}:d=60", CRF_OSCURO)
+    lista = [inicio] + [clara] * (claras - 1) + [transicion] + [oscura] * (vueltas - claras - 2) + [final]
     (OUT / "_lista.txt").write_text("".join(f"file '{r.name}'\n" for r in lista))
     subprocess.run(["ffmpeg", "-v", "error", "-y", "-f", "concat", "-safe", "0", "-i", str(OUT / "_lista.txt"),
                     "-i", str(audio_m4a), "-map", "0:v", "-map", "1:a", "-c", "copy", "-t", str(dur),
                     "-movflags", "+faststart", str(salida)], check=True)
-    for r in {inicio, transicion, oscura, final, OUT / "_lista.txt"}:
+    for r in {inicio, clara, transicion, oscura, final, OUT / "_lista.txt"}:
         r.unlink()
 
 
