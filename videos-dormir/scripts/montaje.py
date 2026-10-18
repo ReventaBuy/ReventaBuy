@@ -18,15 +18,16 @@ import pyloudnorm as pyln
 from scipy.io import wavfile
 
 SR, LOOP = 48000, 120  # LOOP: duración del bucle de vídeo (s)
-# Calidad (CRF: más alto = más compresión). Ajustado para que 3 h quepan en < 500 MB.
-CRF_CLARO, CRF_TRANSICION, CRF_OSCURO = 24, 26, 32
+# Calidad (CRF: más alto = más compresión). HEVC: 3 h caben en ~350 MB sin pérdida visible.
+CRF_CLARO, CRF_TRANSICION, CRF_OSCURO = 25, 27, 30
 AUDIO_KBPS = 128
 OUT = Path(__file__).resolve().parent.parent / "output"
 VOZ_INICIO = 6.0
 LUFS = {"voz": -19.0, "lluvia_con_voz": -30.0, "lluvia_sola": -27.0, "pad": -33.0}
 def codec(crf):
-    return ["-c:v", "libx264", "-preset", "slow", "-crf", str(crf), "-tune", "film", "-x264-params", "aq-mode=3:open-gop=0",
-            "-g", "96", "-pix_fmt", "yuv420p", "-colorspace", "bt709", "-color_primaries", "bt709", "-color_trc", "bt709"]
+    return ["-c:v", "libx265", "-preset", "medium", "-crf", str(crf), "-tag:v", "hvc1",
+            "-x265-params", "log-level=error:aq-mode=3:keyint=96:open-gop=0",
+            "-pix_fmt", "yuv420p", "-colorspace", "bt709", "-color_primaries", "bt709", "-color_trc", "bt709"]
 
 
 def leer_wav(ruta):
@@ -100,7 +101,7 @@ def video(dur, fin_voz, audio_m4a, salida):
     lista = [inicio] + [clara] * (claras - 1) + [transicion] + [oscura] * (vueltas - claras - 2) + [final]
     (OUT / "_lista.txt").write_text("".join(f"file '{r.name}'\n" for r in lista))
     subprocess.run(["ffmpeg", "-v", "error", "-y", "-f", "concat", "-safe", "0", "-i", str(OUT / "_lista.txt"),
-                    "-i", str(audio_m4a), "-map", "0:v", "-map", "1:a", "-c", "copy", "-t", str(dur),
+                    "-i", str(audio_m4a), "-map", "0:v", "-map", "1:a", "-c", "copy", "-tag:v", "hvc1", "-t", str(dur),
                     "-movflags", "+faststart", str(salida)], check=True)
     for r in {inicio, clara, transicion, oscura, final, OUT / "_lista.txt"}:
         r.unlink()
