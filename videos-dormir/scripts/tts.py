@@ -4,7 +4,7 @@ La clave se lee de la variable de entorno ELEVENLABS_API_KEY.
 Cada frase se guarda en output/tts_cache/, así que repetir no gasta créditos.
 
     python3 scripts/tts.py muestras            -> una muestra corta por cada voz candidata
-    python3 scripts/tts.py completo VOICE_ID   -> output/voz.wav con todo el guion
+    python3 scripts/tts.py completo [VOICE_ID] -> output/<vídeo>/voz.wav con todo el guion
 """
 import hashlib
 import json
@@ -19,10 +19,11 @@ from scipy.io import wavfile
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import guion  # noqa: E402
+import proyecto  # noqa: E402
 
 SR = 48000
-OUT = guion.ROOT / "output"
-CACHE = OUT / "tts_cache"
+OUT = proyecto.OUT
+CACHE = proyecto.ROOT / "output" / "tts_cache"  # compartida entre vídeos
 API = "https://api.elevenlabs.io/v1"
 MODELO = "eleven_multilingual_v2"
 AJUSTES = {"stability": 0.65, "similarity_boost": 0.75, "style": 0.0, "use_speaker_boost": True, "speed": 0.85}
@@ -109,7 +110,7 @@ def eventos_muestra(n_frases=9):
 
 
 if __name__ == "__main__":
-    OUT.mkdir(exist_ok=True)
+    OUT.mkdir(parents=True, exist_ok=True)
     modo = sys.argv[1] if len(sys.argv) > 1 else "muestras"
     if modo == "muestras":
         for nombre, voz in CANDIDATAS.items():
@@ -117,7 +118,7 @@ if __name__ == "__main__":
             _, dur = pista(eventos_muestra(), voz, OUT / f"muestra_voz_{nombre}.wav")
             print(f"  -> {dur:.0f} s")
     elif modo == "completo":
-        voz = sys.argv[2]
+        voz = sys.argv[2] if len(sys.argv) > 2 else proyecto.CONF["voz"]
         caps, dur = pista(guion.leer(), voz, OUT / "voz.wav")
         (OUT / "capitulos.json").write_text(json.dumps({"duracion": dur, "capitulos": caps}, ensure_ascii=False, indent=1))
         print(f"voz completa: {dur / 60:.1f} min")

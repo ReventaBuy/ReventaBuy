@@ -43,8 +43,8 @@ meditación guiada para dormir, relajación para dormir, insomnio, dormir profun
 - **Contenido alterado o sintético: Sí** (la voz es IA).
 - **Audiencia:** "No, no es contenido creado para niños".
 - **Idioma del vídeo:** Español. **Categoría:** Estilo y consejos (o Personas y blogs).
-- **Miniatura:** `output/miniatura.png`.
-- **Capítulos:** ya van en la descripción de arriba (si regeneras la voz, cópialos de `output/capitulos_youtube.txt`).
+- **Miniatura:** `output/01/miniatura.png`.
+- **Capítulos:** ya van en la descripción de arriba (si regeneras la voz, cópialos de `output/01/capitulos_youtube.txt`).
 - **Lista de reproducción:** crea "Meditaciones para dormir" y añádelo.
 - **Hora:** publícalo por la tarde para que esté indexado cuando la gente busca por la noche.
 - **Comentario fijado:** una pregunta sencilla, por ejemplo "¿En qué minuto te quedaste dormido/a? 🌙", que anima a comentar.

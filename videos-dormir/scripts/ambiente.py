@@ -1,7 +1,7 @@
 """Genera los sonidos de fondo como bucles perfectos (sin cortes al repetirse).
 
-    output/lluvia_loop.wav  -> 10 min de lluvia suave
-    output/pad_loop.wav     -> música ambiental muy suave (acordes lentos)
+    output/<vídeo>/ambiente_loop.wav  -> 10 min de lluvia o de olas (según proyecto.py)
+    output/<vídeo>/pad_loop.wav       -> música ambiental muy suave (acordes lentos)
 
 Todo se construye en el dominio de la frecuencia o con convolución circular,
 así que el final de cada archivo enlaza exactamente con su principio.
@@ -9,10 +9,11 @@ así que el final de cada archivo enlaza exactamente con su principio.
 import numpy as np
 import scipy.fft as fft
 from scipy.io import wavfile
-from pathlib import Path
+
+import proyecto
 
 SR = 48000
-OUT = Path(__file__).resolve().parent.parent / "output"
+OUT = proyecto.OUT
 rng = np.random.default_rng(7)
 
 
@@ -103,6 +104,45 @@ def lluvia(segundos=600):
     return L, R
 
 
+def envolvente_olas(n, ctrl_hz, olas, subida, caida, cola=6.0):
+    """Suma circular de envolventes de ola a baja resolución, luego interpolada a audio."""
+    m = int(n / SR * ctrl_hz)
+    env = np.zeros((2, m), np.float32)
+    for t0, amp, pan, s, c in olas:
+        s, c = s * subida, c * caida
+        tau = np.arange(-s, c * cola, 1 / ctrl_hz)
+        forma = np.where(tau < 0, 0.5 - 0.5 * np.cos(np.pi * (tau + s) / s), np.exp(-np.maximum(tau, 0) / c))
+        idx = (int(t0 * ctrl_hz) + np.arange(tau.size)) % m  # circular: el bucle no tiene costura
+        np.add.at(env[0], idx, amp * np.cos(pan) * forma)
+        np.add.at(env[1], idx, amp * np.sin(pan) * forma)
+    x_ctrl = np.arange(m + 1) / ctrl_hz
+    x = np.arange(n) / SR
+    return [np.interp(x, x_ctrl, np.append(e, e[0])).astype(np.float32) for e in env]
+
+
+def mar(segundos=600):
+    n = SR * segundos
+    # rumor de fondo: mar lejano, grave y continuo
+    fondo = ruido_con_espectro(n, [20, 50, 120, 300, 800, 2000, 5000, 24000], [-14, -4, 0, -6, -16, -26, -40, -70])
+    fondo_r = ruido_con_espectro(n, [20, 50, 120, 300, 800, 2000, 5000, 24000], [-14, -4, 0, -6, -16, -26, -40, -70])
+    lento = envolvente_lenta(n, 0.15, [2, 5, 11])
+    # olas: una cada 8–14 s, con fuerza, duración y posición estéreo distintas
+    olas, t = [], 0.0
+    while t < segundos:
+        olas.append((t, rng.lognormal(0, 0.25), rng.uniform(0.35, 1.2), rng.uniform(0.8, 1.3), rng.uniform(0.8, 1.3)))
+        t += rng.uniform(8, 14)
+    grave = envolvente_olas(n, 200, olas, subida=3.2, caida=2.8)     # el cuerpo de la ola
+    espuma = envolvente_olas(n, 200, [(t0 + 2.6, a, p, s, c) for t0, a, p, s, c in olas], subida=0.7, caida=2.2)
+    retirada = envolvente_olas(n, 200, [(t0 + 4.5, a * 0.5, p, s, c) for t0, a, p, s, c in olas], subida=1.5, caida=3.5)
+    cuerpo = [ruido_con_espectro(n, [20, 80, 200, 500, 1200, 3000, 8000, 24000], [-30, -10, -3, 0, -6, -18, -36, -70]) for _ in range(2)]
+    siseo = [ruido_con_espectro(n, [20, 300, 900, 2500, 5000, 9000, 16000, 24000], [-60, -24, -8, 0, -4, -14, -30, -60]) for _ in range(2)]
+    # burbujeo de la espuma: modulación rápida e irregular del siseo
+    burbujas = [np.abs(ruido_con_espectro(n, [1, 8, 30, 80, 200, 24000], [-30, 0, 0, -10, -40, -90])) for _ in range(2)]
+    L = 0.5 * fondo * lento + cuerpo[0] * grave[0] + siseo[0] * (0.75 * espuma[0] + 0.45 * retirada[0]) * (0.4 + 0.6 * burbujas[0])
+    R = 0.5 * fondo_r * lento + cuerpo[1] * grave[1] + siseo[1] * (0.75 * espuma[1] + 0.45 * retirada[1]) * (0.4 + 0.6 * burbujas[1])
+    return L, R
+
+
 def nota(hz):
     return 440 * 2 ** ((hz - 69) / 12)  # hz aquí es número MIDI
 
@@ -155,13 +195,7 @@ def guardar(nombre, L, R, pico_db=-3.0):
 
 
 if __name__ == "__main__":
-    OUT.mkdir(exist_ok=True)
-    guardar("lluvia_loop.wav", *lluvia())
-    # Re mayor: Dmaj7 – Bm7 – Gmaj7 – Asus2 (números MIDI; bajo + acorde abierto)
-    acordes = [
-        [38, 50, 54, 57, 61],
-        [35, 47, 50, 54, 57],
-        [31, 43, 50, 54, 59],
-        [33, 45, 47, 52, 57],
-    ]
-    guardar("pad_loop.wav", *pad(acordes))
+    OUT.mkdir(parents=True, exist_ok=True)
+    generador = {"lluvia": lluvia, "mar": mar}[proyecto.CONF["ambiente"]]
+    guardar("ambiente_loop.wav", *generador())
+    guardar("pad_loop.wav", *pad(proyecto.CONF["acordes"]))

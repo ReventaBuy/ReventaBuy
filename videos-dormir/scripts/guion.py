@@ -2,14 +2,16 @@
 import re
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
-GUION = ROOT / "guion.txt"
+import proyecto
+
+ROOT = proyecto.ROOT
+GUION = proyecto.DIR / "guion.txt"
 PAUSA_POR_DEFECTO = 1.2  # segundos entre dos frases seguidas sin [n]
 
 
-def leer(path=GUION):
+def leer(path=None):
     eventos = []  # ("capitulo", titulo) | ("frase", texto) | ("pausa", segundos)
-    for linea in Path(path).read_text(encoding="utf-8").splitlines():
+    for linea in Path(path or GUION).read_text(encoding="utf-8").splitlines():
         linea = linea.strip()
         if not linea or (linea.startswith("#") and not linea.startswith("##")):
             continue

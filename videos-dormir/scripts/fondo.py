@@ -1,23 +1,26 @@
-"""Fondo animado: cabaña en el bosque, de noche, bajo la lluvia.
+"""Fondo animado: cabaña en el bosque, de noche, bajo la lluvia (vídeo 01).
 
-Genera un bucle perfecto de 2 minutos (output/fondo_loop.mp4): todo lo que se mueve
-(nubes, niebla, lluvia, fuego en la ventana) vuelve exactamente al punto de partida.
+También es el motor de render de todas las escenas: genera un bucle perfecto de 2 minutos
+(output/<vídeo>/fondo_loop.mp4) con la escena que indique proyecto.py. Todo lo que se mueve
+vuelve exactamente al punto de partida.
 
-    python3 scripts/fondo.py frame   -> output/fondo_frame.png (para revisar)
-    python3 scripts/fondo.py video   -> output/fondo_loop.mp4
+    python3 scripts/fondo.py frame [n]  -> output/<vídeo>/fondo_frame.png (para revisar)
+    python3 scripts/fondo.py video      -> output/<vídeo>/fondo_loop.mp4
 """
+import importlib
 import subprocess
 import sys
 from multiprocessing import Pool
-from pathlib import Path
 
 import numpy as np
 import scipy.fft as fft
 from PIL import Image, ImageDraw, ImageFilter
 
+import proyecto
+
 W, H, FPS, LOOP = 1920, 1080, 24, 120  # segundos del bucle
 N = FPS * LOOP
-OUT = Path(__file__).resolve().parent.parent / "output"
+OUT = proyecto.OUT
 rng = np.random.default_rng(11)
 
 
@@ -220,29 +223,38 @@ def ffmpeg_salida(ruta):
          "-color_trc", "bt709", "-movflags", "+faststart", str(ruta)], stdin=subprocess.PIPE)
 
 
+ESCENA = None  # módulo de la escena que se está renderizando
+
+
+def cargar_escena(nombre=None):
+    global ESCENA
+    ESCENA = importlib.import_module(nombre or proyecto.CONF["escena"])
+    ESCENA.init()
+    return ESCENA
+
+
 def render_tramo(args):
     k, ini, fin = args
     ruta = OUT / f"_tramo{k}.mp4"
     p = ffmpeg_salida(ruta)
     for i in range(ini, fin):
-        p.stdin.write(fotograma(i).tobytes())
+        p.stdin.write(ESCENA.fotograma(i).tobytes())
     p.stdin.close()
     p.wait()
     return ruta
 
 
 if __name__ == "__main__":
-    OUT.mkdir(exist_ok=True)
+    OUT.mkdir(parents=True, exist_ok=True)
     modo = sys.argv[1] if len(sys.argv) > 1 else "frame"
     if modo == "frame":
-        init()
-        Image.fromarray(fotograma(int(sys.argv[2]) if len(sys.argv) > 2 else 0)).save(OUT / "fondo_frame.png")
+        escena = cargar_escena()
+        Image.fromarray(escena.fotograma(int(sys.argv[2]) if len(sys.argv) > 2 else 0)).save(OUT / "fondo_frame.png")
         print("ok", OUT / "fondo_frame.png")
     else:
         trozos = 4
         cortes = [N * k // trozos for k in range(trozos + 1)]
-        # cada tramo empieza en un múltiplo del GOP para que el corte sea limpio
-        with Pool(trozos, initializer=init) as pool:
+        with Pool(trozos, initializer=cargar_escena) as pool:
             rutas = pool.map(render_tramo, [(k, cortes[k], cortes[k + 1]) for k in range(trozos)])
         lista = OUT / "_tramos.txt"
         lista.write_text("".join(f"file '{r.name}'\n" for r in rutas))

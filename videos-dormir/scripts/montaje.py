@@ -1,10 +1,10 @@
-"""Monta el vídeo final: voz + lluvia + música + fondo animado.
+"""Monta el vídeo final: voz + sonido ambiente + música + fondo animado.
 
-    python3 scripts/montaje.py [horas] [voz.wav]   (por defecto 3 h y output/voz.wav)
+    VIDEO=02 python3 scripts/montaje.py [horas] [voz.wav]   (por defecto 3 h y output/<vídeo>/voz.wav)
 
 Cronología:
   0:00          fundido de entrada; la voz empieza a los VOZ_INICIO segundos
-  fin de voz    la música se apaga en 3 min, la lluvia sube un poco y la imagen se oscurece
+  fin de voz    la música se apaga en 3 min, el ambiente sube un poco y la imagen se oscurece
   último minuto fundido a negro y a silencio
 """
 import json
@@ -17,13 +17,17 @@ import numpy as np
 import pyloudnorm as pyln
 from scipy.io import wavfile
 
+import proyecto
+
 SR, LOOP = 48000, 120  # LOOP: duración del bucle de vídeo (s)
 # Calidad (CRF: más alto = más compresión). HEVC: 3 h caben en ~350 MB sin pérdida visible.
 CRF_CLARO, CRF_TRANSICION, CRF_OSCURO = 25, 27, 30
 AUDIO_KBPS = 128
-OUT = Path(__file__).resolve().parent.parent / "output"
+OUT = proyecto.OUT
 VOZ_INICIO = 6.0
-LUFS = {"voz": -19.0, "lluvia_con_voz": -30.0, "lluvia_sola": -27.0, "pad": -33.0}
+LUFS = {"voz": -19.0, "ambiente_con_voz": -30.0, "ambiente_solo": -27.0, "pad": -33.0}
+
+
 def codec(crf):
     return ["-c:v", "libx265", "-preset", "medium", "-crf", str(crf), "-tag:v", "hvc1",
             "-x265-params", "log-level=error:aq-mode=3:keyint=96:open-gop=0",
@@ -49,10 +53,10 @@ def rampa(t, t0, t1, a, b):
 
 
 def audio(dur, voz_wav, salida):
-    lluvia, pad, voz = leer_wav(OUT / "lluvia_loop.wav"), leer_wav(OUT / "pad_loop.wav"), leer_wav(voz_wav)
+    amb, pad, voz = leer_wav(OUT / "ambiente_loop.wav"), leer_wav(OUT / "pad_loop.wav"), leer_wav(voz_wav)
     voz = voz * ganancia(voz, LUFS["voz"])
-    g_ll = ganancia(lluvia[:SR * 120], LUFS["lluvia_con_voz"])
-    subida = 10 ** ((LUFS["lluvia_sola"] - LUFS["lluvia_con_voz"]) / 20)
+    g_amb = ganancia(amb[:SR * 120], LUFS["ambiente_con_voz"])
+    subida = 10 ** ((LUFS["ambiente_solo"] - LUFS["ambiente_con_voz"]) / 20)
     pad = pad * ganancia(pad, LUFS["pad"])
     fin_voz = VOZ_INICIO + voz.shape[0] / SR
     p = subprocess.Popen(["ffmpeg", "-v", "error", "-y", "-f", "f32le", "-ar", str(SR), "-ac", "2", "-i", "-",
@@ -64,7 +68,7 @@ def audio(dur, voz_wav, salida):
         n = min(trozo, total - ini)
         idx = np.arange(ini, ini + n)
         t = idx / SR
-        y = lluvia[idx % lluvia.shape[0]] * (g_ll * rampa(t, fin_voz + 20, fin_voz + 140, 1, subida))[:, None]
+        y = amb[idx % amb.shape[0]] * (g_amb * rampa(t, fin_voz + 20, fin_voz + 140, 1, subida))[:, None]
         y += pad[idx % pad.shape[0]] * (rampa(t, 0, 15, 0, 1) * rampa(t, fin_voz, fin_voz + 180, 1, 0))[:, None]
         iv = idx - int(VOZ_INICIO * SR)
         ok = (iv >= 0) & (iv < voz.shape[0])
@@ -113,7 +117,7 @@ def capitulos(fin_voz, salida):
     for i, (t, titulo) in enumerate(datos["capitulos"]):
         t = 0 if i == 0 else t + VOZ_INICIO
         lineas.append(f"{int(t // 60)}:{int(t % 60):02d} {titulo}")
-    lineas.append(f"{int(fin_voz // 60) + 1}:00 Lluvia para dormir (sin voz)")
+    lineas.append(f"{int(fin_voz // 60) + 1}:00 {proyecto.CONF['capitulo_final']}")
     salida.write_text("\n".join(lineas) + "\n")
     print("capítulos:\n" + "\n".join(lineas))
 
@@ -122,9 +126,10 @@ if __name__ == "__main__":
     horas = float(sys.argv[1]) if len(sys.argv) > 1 else 3
     voz_wav = Path(sys.argv[2]) if len(sys.argv) > 2 else OUT / "voz.wav"
     dur = horas * 3600
+    salida = OUT / f"{proyecto.CONF['archivo']}.mp4"
     fin_voz = audio(dur, voz_wav, OUT / "_audio.m4a")
     if (OUT / "capitulos.json").exists():
         capitulos(fin_voz, OUT / "capitulos_youtube.txt")
-    video(dur, fin_voz, OUT / "_audio.m4a", OUT / "video_final.mp4")
+    video(dur, fin_voz, OUT / "_audio.m4a", salida)
     (OUT / "_audio.m4a").unlink()
-    print("listo:", OUT / "video_final.mp4")
+    print("listo:", salida)
