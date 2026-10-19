@@ -2,7 +2,8 @@
 
 ## Título (elige uno)
 
-1. **Meditación Guiada para Dormir Profundamente 🌙 Relajación para el Insomnio con Lluvia (3 h)** ← recomendado
+1. **Meditación Guiada para Dormir Profundamente 🌙 22 min de Voz + 3 h de Lluvia** ← recomendado
+   (deja claro que la voz dura 22 minutos y el resto es solo lluvia)
    La miniatura ya hace la pregunta ("¿No puedes dormir?"); el título lleva las palabras que la gente busca.
 2. Si No Puedes Dormir, Escucha Esto 🌙 Relajación Guiada para el Insomnio | Lluvia 3 Horas
 3. Duerme Profundamente Esta Noche 🌧️ Meditación Guiada para Mentes Que No Paran

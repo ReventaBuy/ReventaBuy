@@ -2,8 +2,9 @@
 
 ## Título (elige uno)
 
-1. **Meditación Guiada para Dormir con Ansiedad 🌊 Calma tu Mente con el Sonido del Mar (3 h)** ← recomendado
-   La miniatura hace la pregunta ("¿Tu mente no para?"); el título lleva lo que la gente busca.
+1. **Meditación Guiada para Dormir con Ansiedad 🌊 20 min de Voz + 3 h de Olas del Mar** ← recomendado
+   La miniatura hace la pregunta ("¿Tu mente no para?"); el título lleva lo que la gente busca
+   y deja claro que la voz dura 20 minutos y el resto es solo mar (nadie se siente engañado).
 2. Si Tu Mente No Para, Escucha Esto 🌊 Meditación para Dormir con Ansiedad | 3 h de Olas
 3. Suelta la Ansiedad y Duerme 🌙 Meditación Guiada con Olas del Mar (3 Horas)
 

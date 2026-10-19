@@ -122,14 +122,29 @@ def capitulos(fin_voz, salida):
     print("capítulos:\n" + "\n".join(lineas))
 
 
+def cambiar_audio(salida, audio_m4a):
+    """Sustituye el sonido de un vídeo ya montado, sin volver a codificar la imagen."""
+    anterior = OUT / "_video_anterior.mp4"
+    salida.rename(anterior)
+    subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", str(anterior), "-i", str(audio_m4a), "-map", "0:v", "-map", "1:a",
+                    "-c", "copy", "-tag:v", "hvc1", "-movflags", "+faststart", str(salida)], check=True)
+    anterior.unlink()
+
+
 if __name__ == "__main__":
-    horas = float(sys.argv[1]) if len(sys.argv) > 1 else 3
-    voz_wav = Path(sys.argv[2]) if len(sys.argv) > 2 else OUT / "voz.wav"
+    # --solo-audio: rehace el sonido y reutiliza la imagen del vídeo ya montado (mucho más rápido)
+    solo_audio = "--solo-audio" in sys.argv
+    args = [a for a in sys.argv[1:] if not a.startswith("--")]
+    horas = float(args[0]) if args else 3
+    voz_wav = Path(args[1]) if len(args) > 1 else OUT / "voz.wav"
     dur = horas * 3600
     salida = OUT / f"{proyecto.CONF['archivo']}.mp4"
     fin_voz = audio(dur, voz_wav, OUT / "_audio.m4a")
     if (OUT / "capitulos.json").exists():
         capitulos(fin_voz, OUT / "capitulos_youtube.txt")
-    video(dur, fin_voz, OUT / "_audio.m4a", salida)
+    if solo_audio and salida.exists():
+        cambiar_audio(salida, OUT / "_audio.m4a")
+    else:
+        video(dur, fin_voz, OUT / "_audio.m4a", salida)
     (OUT / "_audio.m4a").unlink()
     print("listo:", salida)

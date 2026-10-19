@@ -120,27 +120,51 @@ def envolvente_olas(n, ctrl_hz, olas, subida, caida, cola=6.0):
     return [np.interp(x, x_ctrl, np.append(e, e[0])).astype(np.float32) for e in env]
 
 
+def chisporroteo(n, env, por_segundo, amp):
+    """Espuma: miles de chasquidos diminutos, cada uno de ruido distinto (sin tono), con densidad según la envolvente."""
+    p = np.clip(env / env.max() * por_segundo / SR, 0, 0.5)
+    tren = np.zeros(n, np.float32)
+    pos = np.flatnonzero(rng.random(n, dtype=np.float32) < p)
+    tren[pos] = rng.lognormal(0, 0.6, pos.size)
+    t = np.arange(int(SR * 0.004)) / SR
+    rafagas = conv_circular(tren, np.exp(-t / 0.0006).astype(np.float32))
+    ruido = ruido_con_espectro(n, [20, 800, 2000, 3500, 6000, 10000, 24000], [-60, -24, -6, 0, -3, -18, -60])
+    return amp * ruido * rafagas
+
+
 def mar(segundos=600):
+    """Olas suaves en la orilla: se acercan, rompen, la espuma chisporrotea y el agua se retira."""
     n = SR * segundos
-    # rumor de fondo: mar lejano, grave y continuo
-    fondo = ruido_con_espectro(n, [20, 50, 120, 300, 800, 2000, 5000, 24000], [-14, -4, 0, -6, -16, -26, -40, -70])
-    fondo_r = ruido_con_espectro(n, [20, 50, 120, 300, 800, 2000, 5000, 24000], [-14, -4, 0, -6, -16, -26, -40, -70])
-    lento = envolvente_lenta(n, 0.15, [2, 5, 11])
-    # olas: una cada 8–14 s, con fuerza, duración y posición estéreo distintas
+    # mar de fondo: rumor grave y continuo que respira despacio
+    lento = envolvente_lenta(n, 0.18, [2, 5, 11])
+    fondo = [ruido_con_espectro(n, [20, 45, 100, 250, 600, 1500, 4000, 24000], [-12, -3, 0, -7, -17, -27, -42, -75]) * lento
+             for _ in range(2)]
+    # una ola cada 7–15 s, cada una con su fuerza, su duración y su lado
     olas, t = [], 0.0
     while t < segundos:
-        olas.append((t, rng.lognormal(0, 0.25), rng.uniform(0.35, 1.2), rng.uniform(0.8, 1.3), rng.uniform(0.8, 1.3)))
-        t += rng.uniform(8, 14)
-    grave = envolvente_olas(n, 200, olas, subida=3.2, caida=2.8)     # el cuerpo de la ola
-    espuma = envolvente_olas(n, 200, [(t0 + 2.6, a, p, s, c) for t0, a, p, s, c in olas], subida=0.7, caida=2.2)
-    retirada = envolvente_olas(n, 200, [(t0 + 4.5, a * 0.5, p, s, c) for t0, a, p, s, c in olas], subida=1.5, caida=3.5)
-    cuerpo = [ruido_con_espectro(n, [20, 80, 200, 500, 1200, 3000, 8000, 24000], [-30, -10, -3, 0, -6, -18, -36, -70]) for _ in range(2)]
-    siseo = [ruido_con_espectro(n, [20, 300, 900, 2500, 5000, 9000, 16000, 24000], [-60, -24, -8, 0, -4, -14, -30, -60]) for _ in range(2)]
-    # burbujeo de la espuma: modulación rápida e irregular del siseo
-    burbujas = [np.abs(ruido_con_espectro(n, [1, 8, 30, 80, 200, 24000], [-30, 0, 0, -10, -40, -90])) for _ in range(2)]
-    L = 0.5 * fondo * lento + cuerpo[0] * grave[0] + siseo[0] * (0.75 * espuma[0] + 0.45 * retirada[0]) * (0.4 + 0.6 * burbujas[0])
-    R = 0.5 * fondo_r * lento + cuerpo[1] * grave[1] + siseo[1] * (0.75 * espuma[1] + 0.45 * retirada[1]) * (0.4 + 0.6 * burbujas[1])
-    return L, R
+        olas.append((t, rng.lognormal(0, 0.3), rng.uniform(0.45, 1.12), rng.uniform(0.8, 1.25), rng.uniform(0.8, 1.3)))
+        t += rng.uniform(7, 15)
+
+    def etapa(retraso, factor=1.0):
+        return [(t0 + retraso * s, a * factor, p, s, c) for t0, a, p, s, c in olas]
+
+    llegada = envolvente_olas(n, 200, olas, subida=3.5, caida=1.6)                # crece al acercarse
+    rompe = envolvente_olas(n, 200, etapa(3.5), subida=1.3, caida=1.8)            # rompe: rugido suave
+    espuma = envolvente_olas(n, 200, etapa(4.0, 0.8), subida=1.4, caida=3.2)      # se extiende y burbujea
+    retirada = envolvente_olas(n, 200, etapa(7.0, 0.35), subida=1.6, caida=3.0)   # vuelve por la arena
+    grave = ([20, 50, 120, 300, 700, 1500, 4000, 24000], [-24, -8, 0, -2, -10, -22, -40, -75])
+    rugido = ([20, 80, 250, 600, 1400, 3000, 6000, 12000, 24000], [-40, -18, -6, 0, -2, -9, -20, -36, -70])
+    siseo = ([20, 400, 1200, 2500, 4500, 8000, 12000, 24000], [-60, -26, -8, -2, 0, -8, -22, -60])
+    canales = []
+    for c in range(2):
+        # siempre queda algo de espuma lejana: las olas no arrancan desde el silencio
+        y = 0.55 * fondo[c] + 0.13 * ruido_con_espectro(n, *siseo) * envolvente_lenta(n, 0.3, [3, 7, 13])
+        y += ruido_con_espectro(n, *grave) * (0.8 * llegada[c] + 0.5 * rompe[c])
+        y += ruido_con_espectro(n, *rugido) * rompe[c]
+        y += ruido_con_espectro(n, *siseo) * (0.55 * espuma[c] + 0.35 * retirada[c])
+        y += chisporroteo(n, espuma[c] + 0.6 * retirada[c], 2500, 0.18)
+        canales.append(y)
+    return canales
 
 
 def nota(hz):
