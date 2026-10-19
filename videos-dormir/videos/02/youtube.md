@@ -18,7 +18,14 @@
 • Cuando termina la voz, la imagen se oscurece sola para no molestarte.
 
 ⏱️ Capítulos
-CAPITULOS
+0:00 Bienvenida
+1:38 Respirar con el mar
+5:33 Volver al presente
+7:44 Soltar la tensión
+11:01 Dejar las preocupaciones
+13:25 La casa junto al mar
+17:32 Hacia el sueño
+20:00 Olas del mar para dormir (sin voz)
 
 🌙 Si te ayuda a descansar, suscríbete a Refugio del Sueño: cada semana, un nuevo refugio para dormir.
 
