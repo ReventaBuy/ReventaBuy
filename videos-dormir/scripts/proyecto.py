@@ -44,6 +44,11 @@ VIDEOS = {
         voz=VOZ_JHENNY,
         capitulo_final="Chimenea y nieve para dormir (sin voz)",
         miniatura=("UNA HISTORIA", "PARA DORMIR", "La cabaña en la nieve · 3 h de chimenea"),
+        miniatura_impacto=dict(
+            recorte=(240, 400, 1120, 895), texto_ancho=620, frame=864, calidez=0.6,
+            variantes=[("A", ["UNA HISTORIA", "PARA DORMIR"], "la cabaña en la nieve"),
+                       ("B", ["UNA NOCHE", "DE NIEVE"], "historia para dormir · voz suave"),
+                       ("C", ["NIEVA.", "TÚ DUERMES."], "historia para dormir · chimenea")]),
         archivo="Historia_para_dormir_la_cabana_en_la_nieve_3h",
         bucle_transicion="fondo_parando.mp4",  # al acabar la historia deja de nevar poco a poco…
         bucle_oscuro="fondo_sin_nieve.mp4",  # …y el resto de la noche está en calma (pesa mucho menos)

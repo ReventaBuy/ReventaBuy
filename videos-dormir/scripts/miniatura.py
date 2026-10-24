@@ -41,6 +41,8 @@ def estilo_impacto(frame, conf):
     x = lum + (x - lum) * 1.3                                   # colores más vivos
     x = np.clip(x * 1.15, 0, 1) ** 0.8                           # más luz sin quemar la ventana
     x += np.array([0.0, 0.025, 0.06], np.float32) * (1 - lum) ** 3  # sombras azuladas: contraste con el naranja
+    calido = np.clip((x[..., :1] - x[..., 2:]) * 4, 0, 1)        # zonas de luz cálida (ventanas, reflejos)
+    x += calido * x * conf.get("calidez", 0.0)
     u = np.linspace(0, 1, 1280, dtype=np.float32)[None, :, None]
     frio = 1 - np.clip((u - 0.30) / 0.12, 0, 1)                   # zona del texto: noche azul, no marrón
     x = x * (1 - 0.6 * frio) + (x @ np.array([0.2, 0.3, 0.5], np.float32))[..., None] * np.array([0.55, 0.8, 1.6], np.float32) * 0.6 * frio
