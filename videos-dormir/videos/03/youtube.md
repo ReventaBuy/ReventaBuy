@@ -18,7 +18,15 @@ Una historia tranquila para dormir, en la que no pasa nada importante: un paseo 
 • La imagen se oscurece sola para no molestarte.
 
 ⏱️ Capítulos
-CAPITULOS
+0:00 Antes de empezar
+1:53 El camino entre los pinos
+6:51 La cabaña
+9:56 Una taza de té
+12:42 Una cena sencilla
+16:05 Junto al fuego
+21:08 La noche en la montaña
+24:55 A dormir
+29:00 Chimenea y nieve para dormir (sin voz)
 
 🌙 Si te ayuda a descansar, suscríbete a Refugio del Sueño: cada semana, un nuevo refugio para dormir.
 
