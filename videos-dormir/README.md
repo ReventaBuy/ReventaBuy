@@ -10,6 +10,7 @@ Lo generado va a `output/<id>/` y no se sube a git.
 | 02 | Meditación para dormir con ansiedad | Casa del farero junto al mar | Olas |
 | 03 | Historia para dormir: La cabaña en la nieve | Cabaña nevada con humo en la chimenea | Chimenea y viento |
 | 04 | Relajación profunda: lluvia en la ventana | Ventana iluminada con un gato, bajo la lluvia | Lluvia en la ventana |
+| 05 | Método militar para dormir (guiado) | Barca con farol en un lago de noche | Lago nocturno con grillos |
 
 ## Hacer un vídeo
 

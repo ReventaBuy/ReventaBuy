@@ -23,7 +23,19 @@ El método militar para dormir es una técnica de relajación que se enseñaba a
 • Cuando termina la voz, la imagen se oscurece sola para no molestarte.
 
 ⏱️ Capítulos
-CAPITULOS
+0:00 Bienvenida
+1:34 Llegar a la cama
+2:45 Respirar despacio
+5:11 Relajar la cara
+7:33 Hombros y brazos
+9:45 El pecho
+10:35 Las piernas
+13:00 Dejar las preocupaciones para mañana
+14:57 La barca en el lago
+17:55 La hamaca
+20:33 Imágenes sueltas
+23:10 Hacia el sueño
+26:00 Lago nocturno para dormir (sin voz)
 
 🌙 Si te ayuda a descansar, suscríbete a Refugio del Sueño: cada semana, un nuevo refugio para dormir.
 
