@@ -1,6 +1,6 @@
 """Genera los sonidos de fondo como bucles perfectos (sin cortes al repetirse).
 
-    output/<vídeo>/ambiente_loop.wav  -> 10 min de lluvia o de olas (según proyecto.py)
+    output/<vídeo>/ambiente_loop.wav  -> 10 min de lluvia, olas o chimenea (según proyecto.py)
     output/<vídeo>/pad_loop.wav       -> música ambiental muy suave (acordes lentos)
 
 Todo se construye en el dominio de la frecuencia o con convolución circular,
@@ -167,6 +167,50 @@ def mar(segundos=600):
     return canales
 
 
+def modulacion(n, hz_corte, profundidad):
+    """Variación lenta e irregular (por debajo de hz_corte), periódica en el bucle, alrededor de 1."""
+    m = int(n / SR * 100)
+    f = fft.rfftfreq(m, 1 / 100)
+    mag = 1 / (1 + (f / hz_corte) ** 4)
+    mag[0] = 0
+    x = fft.irfft(mag * np.exp(2j * np.pi * rng.random(f.size)), m)
+    x /= np.abs(x).max()
+    xs = np.interp(np.arange(n) / SR, np.arange(m + 1) / 100, np.append(x, x[0]))
+    return (1 + profundidad * xs).astype(np.float32)
+
+
+def chasquidos(n, por_segundo, actividad, tau_ms, color, sigma):
+    """Chasquidos del fuego: ráfagas de ruido (sin tono) con densidad según la actividad."""
+    p = np.clip(actividad / actividad.mean() * por_segundo / SR, 0, 0.5)
+    tren = np.zeros(n, np.float32)
+    pos = np.flatnonzero(rng.random(n, dtype=np.float32) < p)
+    a = rng.lognormal(0, sigma, pos.size).astype(np.float32)
+    tren[pos] = np.minimum(a, np.percentile(a, 90))  # tope: ningún estallido demasiado fuerte
+    t = np.arange(int(SR * tau_ms * 8 / 1000)) / SR
+    rafagas = conv_circular(tren, np.exp(-t / (tau_ms / 1000)).astype(np.float32))
+    return ruido_con_espectro(n, *color) * rafagas
+
+
+def chimenea(segundos=600):
+    """Fuego de leña en la chimenea y, fuera, un viento muy suave."""
+    n = SR * segundos
+    canales = []
+    for _ in range(2):
+        llamas = modulacion(n, 0.8, 0.35) * modulacion(n, 0.05, 0.2)
+        rumor = ruido_con_espectro(n, [20, 40, 80, 200, 500, 1500, 5000, 24000], [-20, -6, 0, -4, -14, -30, -50, -80]) * llamas
+        siseo = ruido_con_espectro(n, [20, 1000, 3000, 6000, 12000, 24000], [-80, -30, -10, -6, -16, -50]) * modulacion(n, 0.3, 0.5)
+        actividad = np.maximum(modulacion(n, 0.5, 0.8), 0.05) * llamas  # los chasquidos llegan a rachas
+        finos = chasquidos(n, 17, actividad, 0.8, ([20, 1500, 3500, 7000, 12000, 24000], [-60, -8, 0, -8, -26, -60]), 0.4)
+        medios = chasquidos(n, 4, actividad, 2.5, ([20, 400, 1200, 3000, 6000, 24000], [-50, -8, 0, -5, -22, -60]), 0.45)
+        gordos = chasquidos(n, 0.35, actividad, 8.0, ([20, 150, 500, 1500, 4000, 24000], [-40, -6, 0, -6, -24, -70]), 0.4)
+        viento = ruido_con_espectro(n, [20, 60, 150, 400, 1000, 3000, 24000], [-10, 0, -3, -15, -35, -60, -90]) * modulacion(n, 0.08, 0.6)
+        # el crepitar es lo protagonista; el rumor de las llamas y el viento quedan suaves de fondo
+        y = 0.40 * rumor + 0.06 * siseo + 0.55 * finos + 1.3 * medios + 1.6 * gordos + 0.12 * viento
+        k = 6 * np.sqrt(np.mean(y ** 2))  # limitador suave: los picos no pasan de ~15 dB sobre la media
+        canales.append(k * np.tanh(y / k))
+    return canales
+
+
 def nota(hz):
     return 440 * 2 ** ((hz - 69) / 12)  # hz aquí es número MIDI
 
@@ -220,6 +264,6 @@ def guardar(nombre, L, R, pico_db=-3.0):
 
 if __name__ == "__main__":
     OUT.mkdir(parents=True, exist_ok=True)
-    generador = {"lluvia": lluvia, "mar": mar}[proyecto.CONF["ambiente"]]
+    generador = {"lluvia": lluvia, "mar": mar, "chimenea": chimenea}[proyecto.CONF["ambiente"]]
     guardar("ambiente_loop.wav", *generador())
     guardar("pad_loop.wav", *pad(proyecto.CONF["acordes"]))

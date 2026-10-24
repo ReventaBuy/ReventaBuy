@@ -92,7 +92,8 @@ def variante(nombre, filtro, crf=20):
 
 def video(dur, fin_voz, audio_m4a, salida):
     vueltas = math.ceil(dur / LOOP)
-    claras = max(1, math.ceil((fin_voz + 60) / LOOP))
+    oscurecer = min(fin_voz + 60, proyecto.CONF.get("oscurecer_min", 1e9) * 60)  # cuándo empieza a oscurecerse
+    claras = max(1, math.ceil(oscurecer / LOOP))
     oscuro = 0.6  # opacidad del negro encima de la imagen después de la voz
     negro = f"color=black:s=1920x1080:r=24:d={LOOP},format=rgba"
     inicio = variante("inicio", "[0:v]fade=in:st=0:d=4", CRF_CLARO)

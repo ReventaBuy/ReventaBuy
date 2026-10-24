@@ -36,6 +36,17 @@ VIDEOS = {
         texto_y=330,  # texto sobre el mar, para no tapar la luna
         archivo="Meditacion_para_dormir_con_ansiedad_3h",
     ),
+    "03": dict(
+        escena="fondo_nieve",  # cabaña nevada con chimenea, de noche
+        ambiente="chimenea",
+        # La menor: Am9 – Fmaj7 – Cmaj7 – G6
+        acordes=[[33, 45, 52, 55, 59], [29, 41, 48, 52, 57], [36, 48, 52, 55, 59], [31, 43, 50, 55, 57]],
+        voz=VOZ_JHENNY,
+        capitulo_final="Chimenea y nieve para dormir (sin voz)",
+        miniatura=("UNA HISTORIA", "PARA DORMIR", "La cabaña en la nieve · 3 h de chimenea"),
+        archivo="Historia_para_dormir_la_cabana_en_la_nieve_3h",
+        oscurecer_min=24,  # la imagen se oscurece antes de que acabe la voz (cabe en < 400 MB)
+    ),
 }
 
 ID = os.environ.get("VIDEO", "01")

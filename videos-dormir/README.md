@@ -8,6 +8,7 @@ Lo generado va a `output/<id>/` y no se sube a git.
 |---|---|---|---|
 | 01 | Relajación guiada para el insomnio | Cabaña en el bosque bajo la lluvia | Lluvia |
 | 02 | Meditación para dormir con ansiedad | Casa del farero junto al mar | Olas |
+| 03 | Historia para dormir: La cabaña en la nieve | Cabaña nevada con humo en la chimenea | Chimenea y viento |
 
 ## Hacer un vídeo
 
