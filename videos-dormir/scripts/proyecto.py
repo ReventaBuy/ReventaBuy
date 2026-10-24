@@ -22,6 +22,8 @@ VIDEOS = {
         voz=VOZ_JHENNY,
         capitulo_final="Lluvia para dormir (sin voz)",
         miniatura=("¿NO PUEDES", "DORMIR?", "Relajación guiada · 3 h de lluvia"),
+        miniatura_impacto=dict(recorte=(60, 400, 940, 895), texto_ancho=620, frame=864, calidez=0.6,
+                               variantes=[("A", ["¿NO PUEDES", "DORMIR?"], "relajación guiada · lluvia")]),
         archivo="Meditacion_guiada_para_dormir_3h",
     ),
     "02": dict(
@@ -32,6 +34,9 @@ VIDEOS = {
         voz=VOZ_JHENNY,
         capitulo_final="Olas del mar para dormir (sin voz)",
         miniatura=("¿TU MENTE", "NO PARA?", "Meditación para la ansiedad · 3 h de olas"),
+        miniatura_impacto=dict(recorte=(520, 60, 1920, 848), texto_ancho=560, frame=360, calidez=0.6,
+                               texto_centro_y=480,  # sobre el mar, para no tapar la luna
+                               variantes=[("A", ["¿TU MENTE", "NO PARA?"], "meditación para la ansiedad")]),
         frame_miniatura=360,  # el haz del faro barre hacia el mar
         texto_y=330,  # texto sobre el mar, para no tapar la luna
         archivo="Meditacion_para_dormir_con_ansiedad_3h",

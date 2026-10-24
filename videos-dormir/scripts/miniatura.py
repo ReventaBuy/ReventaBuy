@@ -58,7 +58,7 @@ def estilo_impacto(frame, conf):
             tam -= 2
         f = ImageFont.truetype(negra, tam)
         alto_linea = int(tam * 1.02)
-        y = 360 - (alto_linea * len(lineas) + 70) // 2
+        y = conf.get("texto_centro_y", 360) - (alto_linea * len(lineas) + 70) // 2
         for j, linea in enumerate(lineas):
             color = (255, 250, 240) if j == 0 else (255, 188, 96)
             sombra = Image.new("RGBA", img.size, (0, 0, 0, 0))
