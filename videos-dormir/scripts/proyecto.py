@@ -75,7 +75,8 @@ VIDEOS = {
         bucle_transicion="fondo_amainando.mp4",  # al acabar la voz, la lluvia visible amaina (el sonido sigue)…
         bucle_oscuro="fondo_suave.mp4",  # …y en la parte oscura queda una llovizna ligera (pesa mucho menos)
         crf_claro=28, crf_oscuro=34, audio_kbps=112,  # la lluvia en movimiento pesa mucho: así cabe en < 400 MB
-    ),    "05": dict(
+    ),
+    "05": dict(
         escena="fondo_lago",  # barca con farol en un lago en calma, de noche
         ambiente="lago",
         # Re bemol mayor: Dbmaj9 – Bbm7 – Gbmaj7 – Absus2
