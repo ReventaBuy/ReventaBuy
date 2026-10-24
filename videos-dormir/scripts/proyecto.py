@@ -45,10 +45,9 @@ VIDEOS = {
         capitulo_final="Chimenea y nieve para dormir (sin voz)",
         miniatura=("UNA HISTORIA", "PARA DORMIR", "La cabaña en la nieve · 3 h de chimenea"),
         archivo="Historia_para_dormir_la_cabana_en_la_nieve_3h",
-        oscurecer_min=24,  # la imagen se oscurece antes de que acabe la voz (cabe en < 400 MB)
-        bucle_transicion="fondo_parando.mp4",  # al oscurecerse, deja de nevar poco a poco…
+        bucle_transicion="fondo_parando.mp4",  # al acabar la historia deja de nevar poco a poco…
         bucle_oscuro="fondo_sin_nieve.mp4",  # …y el resto de la noche está en calma (pesa mucho menos)
-        audio_kbps=112,
+        crf_claro=28, audio_kbps=112,  # la nieve cayendo pesa mucho: así cabe en < 400 MB
     ),
 }
 
