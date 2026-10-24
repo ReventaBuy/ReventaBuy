@@ -4,7 +4,12 @@ Vista desde fuera: pared de tablas mojada, ventana de cuatro cristales con luz c
 y una estantería; un gato dormido en el alféizar interior que mueve la cola despacio; gotas en el cristal
 (algunas resbalan) y lluvia que brilla al pasar por delante de la luz.
 Todo lo que se mueve tiene un número entero de ciclos por bucle (ver fondo.py).
+
+Variable de entorno LLUVIA: "1" lluvia normal (por defecto), "suave" llovizna, "amainando" pasa de una a otra
+a lo largo del bucle (para la parte oscura del vídeo, que así pesa mucho menos).
 """
+import os
+
 import numpy as np
 from PIL import Image, ImageDraw, ImageFilter
 
@@ -217,9 +222,12 @@ def fotograma(i):
     capa = Image.new("L", (W, H), 0)
     dl = ImageDraw.Draw(capa)
     ll = dn["lluvia"]
-    ys = (ll["y"] + fase * ll["vueltas"] * (H + 80)) % (H + 80) - 80
-    xs = (ll["x"] + ys * 0.10) % W
-    for x, y, lg, al in zip(xs, ys, ll["largo"], ll["alfa"]):
+    modo = os.environ.get("LLUVIA", "1")
+    cantidad = {"1": 1.0, "suave": 0.25}.get(modo, 1 - 0.75 * float(smooth(0.05, 0.9, fase)))
+    k = int(len(ll["x"]) * cantidad)
+    ys = (ll["y"][:k] + fase * ll["vueltas"][:k] * (H + 80)) % (H + 80) - 80
+    xs = (ll["x"][:k] + ys * 0.10) % W
+    for x, y, lg, al in zip(xs, ys, ll["largo"][:k], ll["alfa"][:k]):
         dl.line([(x, y), (x + lg * 0.10, y + lg)], fill=int(al * 255), width=1)
     a = (np.asarray(capa, np.float32) / 255)
     brillo = 0.12 + 1.2 * e["luz"]
