@@ -163,8 +163,7 @@ def preparar_dinamico():
     m = 26  # gotas que resbalan por el cristal
     resbalan = dict(x=rng.uniform(GX0 + 10, GX1 - 10, m), y0=rng.uniform(GY0, GY0 + 200, m),
                     ciclos=rng.integers(1, 4, m), fase=rng.random(m), r=rng.uniform(3, 5.5, m))
-    lampara = [(rng.uniform(0.015, 0.03), int(c), rng.uniform(0, 6.28)) for c in (41, 67, 109)]
-    return dict(lluvia=lluvia, resbalan=resbalan, lampara=lampara)
+    return dict(lluvia=lluvia, resbalan=resbalan)
 
 
 ESTATICA = DINAMICA = None
@@ -178,20 +177,21 @@ def init():
 def fotograma(i):
     e, dn = ESTATICA, DINAMICA
     fase = i / N
-    f = 1 + sum(a * np.sin(2 * np.pi * c * fase + p) for a, c, p in dn["lampara"])  # la lámpara respira un poco
 
     # interior con el gato y su cola
-    inter = e["interior"] * f
+    # la luz es eléctrica y estable: un parpadeo global obligaría a recomprimir media imagen en cada fotograma
+    inter = e["interior"].copy()
+    gx0, gy0, gx1, gy1 = 1040, 630, 1480, 830  # zona del gato y su cola
     cola_pts, grosor = cola(fase)
-    capa = Image.new("L", (W * SS, H * SS), 0)
+    capa = Image.new("L", ((gx1 - gx0) * SS, (gy1 - gy0) * SS), 0)
     dc = ImageDraw.Draw(capa)
     for (x0, y0), (x1, y1), g in zip(cola_pts[:-1], cola_pts[1:], grosor):
-        dc.line([(x0 * SS, y0 * SS), (x1 * SS, y1 * SS)], fill=255, width=int(g * SS))
-        dc.ellipse([(x1 - g / 2) * SS, (y1 - g / 2) * SS, (x1 + g / 2) * SS, (y1 + g / 2) * SS], fill=255)
-    m_gato = np.maximum(e["m_gato"], np.asarray(capa.resize((W, H), Image.LANCZOS), np.float32) / 255)
-    inter = inter * (1 - m_gato[..., None]) + GATO * m_gato[..., None]
-    borde = np.clip(m_gato - np.roll(np.roll(m_gato, 3, axis=0), 2, axis=1), 0, 1)
-    inter += (borde * 0.45)[..., None] * col(1.0, 0.7, 0.4)
+        dc.line([((x0 - gx0) * SS, (y0 - gy0) * SS), ((x1 - gx0) * SS, (y1 - gy0) * SS)], fill=255, width=int(g * SS))
+        dc.ellipse([(x1 - gx0 - g / 2) * SS, (y1 - gy0 - g / 2) * SS, (x1 - gx0 + g / 2) * SS, (y1 - gy0 + g / 2) * SS], fill=255)
+    m = np.maximum(e["m_gato"][gy0:gy1, gx0:gx1], np.asarray(capa.resize((gx1 - gx0, gy1 - gy0), Image.LANCZOS), np.float32) / 255)
+    zona = inter[gy0:gy1, gx0:gx1] * (1 - m[..., None]) + GATO * m[..., None]
+    borde = np.clip(m - np.roll(np.roll(m, 3, axis=0), 2, axis=1), 0, 1)
+    inter[gy0:gy1, gx0:gx1] = zona + (borde * 0.45)[..., None] * col(1.0, 0.7, 0.4)
 
     # cristal: interior + reflejo + gotas fijas + gotas que resbalan con su rastro
     v = e["vidrio"][..., None]
@@ -200,21 +200,22 @@ def fotograma(i):
     g = e["gotas"]
     img = img * (1 - g[..., 3:]) + g[..., :3] * g[..., 3:]
     r = dn["resbalan"]
-    capa = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    capa = Image.new("RGBA", (GX1 - GX0, GY1 - GY0), (0, 0, 0, 0))
     dr = ImageDraw.Draw(capa)
-    for x, y0, c, ph, rad in zip(r["x"], r["y0"], r["ciclos"], r["fase"], r["r"]):
+    for x, y0, c, ph, rad in zip(r["x"] - GX0, r["y0"] - GY0, r["ciclos"], r["fase"], r["r"]):
         u = (c * fase + ph) % 1.0
-        y = y0 + u * (GY1 - y0)
+        y = y0 + u * (GY1 - GY0 - y0)
         dr.line([(x, y0), (x, y - rad)], fill=(255, 220, 180, 34), width=2)  # rastro: el cristal queda más limpio
         dr.ellipse([x - rad, y - rad * 1.2, x + rad, y + rad * 1.2], fill=(15, 10, 12, 90))
         dr.ellipse([x - rad * 0.4, y, x + rad * 0.35, y + rad * 0.8], fill=(255, 235, 210, 150))
     gd = np.asarray(capa.filter(ImageFilter.GaussianBlur(0.6)), np.float32) / 255
-    img = img * (1 - gd[..., 3:] * v) + gd[..., :3] * gd[..., 3:] * v
+    zona = img[GY0:GY1, GX0:GX1]
+    img[GY0:GY1, GX0:GX1] = zona * (1 - gd[..., 3:]) + gd[..., :3] * gd[..., 3:]
 
     # luz sobre la pared, marco, maceta
-    img += (e["luz"] * f)[..., None] * PARED_LUZ * 0.22 * (1 - v)
+    img += e["luz"][..., None] * PARED_LUZ * 0.22 * (1 - v)
     m = e["m_marco"][..., None]
-    img = img * (1 - m) + e["c_marco"] * f * m
+    img = img * (1 - m) + e["c_marco"] * m
     for mk, c in ((e["m_maceta"], col(0.30, 0.13, 0.08) * 0.6), (e["m_hojas"], col(0.05, 0.12, 0.07))):
         img = img * (1 - mk[..., None]) + c * mk[..., None]
 
@@ -223,14 +224,16 @@ def fotograma(i):
     dl = ImageDraw.Draw(capa)
     ll = dn["lluvia"]
     modo = os.environ.get("LLUVIA", "1")
-    cantidad = {"1": 1.0, "suave": 0.25}.get(modo, 1 - 0.75 * float(smooth(0.05, 0.9, fase)))
-    k = int(len(ll["x"]) * cantidad)
+    cantidad = {"1": 1.0, "suave": 0.2}.get(modo, 1 - 0.8 * float(smooth(0.05, 0.9, fase)))
+    k = int(len(ll["x"]) * 0.5 * cantidad)  # la lluvia dibujada es lo que más pesa al comprimir
     ys = (ll["y"][:k] + fase * ll["vueltas"][:k] * (H + 80)) % (H + 80) - 80
     xs = (ll["x"][:k] + ys * 0.10) % W
     for x, y, lg, al in zip(xs, ys, ll["largo"][:k], ll["alfa"][:k]):
+        if e["luz"][int(np.clip(y + lg / 2, 0, H - 1)), int(np.clip(x, 0, W - 1))] < 0.15:
+            continue  # lejos de la luz no se vería: no se dibuja (y el vídeo pesa mucho menos)
         dl.line([(x, y), (x + lg * 0.10, y + lg)], fill=int(al * 255), width=1)
-    a = (np.asarray(capa, np.float32) / 255)
-    brillo = 0.12 + 1.2 * e["luz"]
+    a = np.asarray(capa.filter(ImageFilter.GaussianBlur(0.9)), np.float32) / 255 * 1.6  # trazos suaves, como de noche
+    brillo = 0.05 + 1.3 * e["luz"]
     c_ll = LLUVIA_FRIA * 0.4 + LLUVIA_CALIDA * e["luz"][..., None] * 1.3
     img = img * (1 - (a * np.minimum(brillo, 1))[..., None]) + c_ll * (a * brillo)[..., None]
 
