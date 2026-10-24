@@ -82,7 +82,13 @@ VIDEOS = {
         acordes=[[37, 49, 53, 56, 60], [34, 46, 49, 53, 56], [30, 42, 49, 53, 58], [32, 44, 46, 51, 56]],
         voz=VOZ_JHENNY,
         capitulo_final="Lago nocturno para dormir (sin voz)",
+        miniatura_impacto=dict(
+            recorte=(560, 120, 1880, 862), texto_ancho=480, frame=300, calidez=0.6,
+            variantes=[("A", ["MÉTODO", "MILITAR"], "para dormir · versión guiada"),
+                       ("B", ["SUELTA", "TU CUERPO"], "relajación profunda para dormir"),
+                       ("C", ["FLOTA…", "Y DUERME"], "método militar guiado")]),
         archivo="Metodo_militar_para_dormir_guiado_3h",
+        crf_claro=22, audio_kbps=160,  # la escena comprime muy bien: se aprovecha para dar más calidad al audio
     ),
 }
 

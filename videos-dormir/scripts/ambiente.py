@@ -233,6 +233,63 @@ def lluvia_ventana(segundos=600):
     return salida
 
 
+def grillo(n, f0, chirridos_s, pulsos, distancia):
+    """Un grillo: chirridos de varios pulsos a f0 Hz, a rachas; más lejos = más bajo y más apagado."""
+    segundos = n / SR
+    f0 = round(f0 * segundos) / segundos  # número entero de ciclos en el bucle: sin costura
+    t = np.arange(n) / SR
+    portadora = np.sin(2 * np.pi * f0 * t + 0.3 * np.sin(2 * np.pi * round(5 * segundos) / segundos * t))
+    tren = np.zeros(n, np.float32)
+    k, pos = 0.0, []
+    while k < segundos:
+        for p in range(pulsos):
+            pos.append(k + p / 32)  # pulsos a ~32 por segundo dentro del chirrido
+        k += 1 / chirridos_s * rng.uniform(0.9, 1.1)
+    idx = (np.array(pos) * SR).astype(int) % n
+    np.add.at(tren, idx, rng.uniform(0.7, 1.0, idx.size).astype(np.float32))
+    m = int(0.014 * SR)
+    pulso = np.sin(np.linspace(0, np.pi, m)) ** 2
+    env = conv_circular(tren, pulso.astype(np.float32))
+    rachas = np.clip(modulacion(n, 0.06, 1.4) - 0.3, 0, None)  # canta un rato, calla otro
+    y = (portadora * env * rachas).astype(np.float32)
+    return conv_circular(y, np.hanning(int(2 + distancia * 6)).astype(np.float32)) / (1 + distancia)
+
+
+def lago(segundos=600):
+    """Lago de noche: murmullo de agua, chapoteo suave contra la barca, grillos lejanos y brisa en los juncos."""
+    n = SR * segundos
+    # chapoteos: olitas cada 1,5–4 s; a veces un segundo golpe más pequeño cuando el agua vuelve
+    olas, t = [], 0.0
+    while t < segundos:
+        olas.append((t, rng.lognormal(0, 0.35), rng.uniform(0.35, 1.2), rng.uniform(0.8, 1.3), rng.uniform(0.8, 1.3)))
+        if rng.random() < 0.5:
+            olas.append((t + rng.uniform(0.4, 0.8), olas[-1][1] * 0.45, olas[-1][2], 1.0, 1.0))
+        t += rng.uniform(1.5, 4.0)
+    golpe = envolvente_olas(n, 400, olas, subida=0.18, caida=0.45)  # el agua llega suave, no de golpe
+    salpicon = envolvente_olas(n, 400, [(t0 + 0.12, a * 0.5, p, s, c) for t0, a, p, s, c in olas], subida=0.08, caida=0.18)
+    canales = []
+    for c in range(2):
+        murmullo = ruido_con_espectro(n, [20, 60, 150, 400, 900, 2000, 5000, 24000], [-20, -8, -2, -4, -14, -28, -45, -80])
+        murmullo *= modulacion(n, 0.15, 0.3)
+        # "clop" hueco del agua contra la madera: grave, con una resonancia suave hacia 320 Hz
+        agua = ruido_con_espectro(n, [20, 100, 220, 320, 450, 800, 1500, 3000, 24000], [-40, -14, -4, 0, -5, -14, -28, -45, -90])
+        gotas_agua = ruido_con_espectro(n, [20, 500, 1200, 2500, 4000, 8000, 24000], [-60, -16, -4, -2, -14, -40, -80])
+        brisa = ruido_con_espectro(n, [20, 500, 1500, 3500, 7000, 14000, 24000], [-60, -24, -10, -6, -12, -30, -70])
+        brisa *= np.clip(modulacion(n, 0.1, 0.8), 0.05, None)
+        y = 0.28 * murmullo + 0.9 * agua * golpe[c] + 0.16 * gotas_agua * salpicon[c] + 0.06 * brisa
+        canales.append(y)
+    # grillos: tres, con su tono, ritmo, distancia y lado
+    for f0, ritmo, pulsos, dist, lado in ((4600, 2.4, 3, 1.0, 0.25), (4300, 1.9, 4, 2.0, 0.75), (4900, 2.8, 3, 3.0, 0.5)):
+        g = grillo(n, f0, ritmo, pulsos, dist) * 0.05
+        canales[0] += g * np.cos(lado * np.pi / 2)
+        canales[1] += g * np.sin(lado * np.pi / 2)
+    salida = []
+    for y in canales:
+        k = 6 * np.sqrt(np.mean(y ** 2))  # limitador suave de picos
+        salida.append(k * np.tanh(y / k))
+    return salida
+
+
 def nota(hz):
     return 440 * 2 ** ((hz - 69) / 12)  # hz aquí es número MIDI
 
@@ -286,6 +343,7 @@ def guardar(nombre, L, R, pico_db=-3.0):
 
 if __name__ == "__main__":
     OUT.mkdir(parents=True, exist_ok=True)
-    generador = {"lluvia": lluvia, "mar": mar, "chimenea": chimenea, "lluvia_ventana": lluvia_ventana}[proyecto.CONF["ambiente"]]
+    generador = {"lluvia": lluvia, "mar": mar, "chimenea": chimenea, "lluvia_ventana": lluvia_ventana,
+                 "lago": lago}[proyecto.CONF["ambiente"]]
     guardar("ambiente_loop.wav", *generador())
     guardar("pad_loop.wav", *pad(proyecto.CONF["acordes"]))
