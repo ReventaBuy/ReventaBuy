@@ -50,5 +50,7 @@ y, si quieres otra escena, crea `scripts/fondo_<nombre>.py` con `init()` y `foto
   foco grande, contraste cálido/frío, texto enorme y corto; generar 3 variantes para la prueba A/B.
 - **Entrega**: el dueño trabaja desde el iPhone. El vídeo final debe pesar < 400 MiB (límite para
   enviarlo) y se entrega en .zip; además, una versión ligera (H.264, ~50 MB) para verlo en el chat.
+  Mejor ≤ 380 MB: en el iPhone el .zip del vídeo 4 (409 MB) no se descargaba y desde el PC sí; los de 315–360 MB
+  sí bajaron en el móvil.
   Cuidado con lo que pesa al comprimir: la lluvia o nieve dibujadas y los parpadeos globales disparan el tamaño.
 - **Publicación**: máximo un vídeo al día; ritmo recomendado 2–3 por semana, a las 19:00 (hora de España).
