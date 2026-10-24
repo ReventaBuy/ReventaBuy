@@ -36,8 +36,11 @@ y, si quieres otra escena, crea `scripts/fondo_<nombre>.py` con `init()` y `foto
   cada frase pensada para relajar y facilitar dormir cuanto antes. Seguir siempre `GUIA_GUION.md`
   y pasar su lista de revisión antes de generar la voz.
 - **Voz**: se puede elegir otra voz de ElevenLabs o ir cambiándola de vez en cuando. Se pueden probar
-  varias (gastando algunos créditos en muestras) y quedarse con la mejor. Hasta ahora: Jhenny
-  (`D9MdulIxfrCUUJcGNQon`), latina, suave. Las voces de la biblioteca necesitan plan de pago (Starter).
+  varias (gastando algunos créditos en muestras) y quedarse con la mejor (`scripts/casting.py`).
+  Casting del vídeo 05 (mismo fragmento): **Jhenny** (`D9MdulIxfrCUUJcGNQon`) es la que más relaja
+  (la más pausada, tono más estable, más cálida, menos eses) → voz principal del canal. Mejor voz
+  masculina: **Juan Carlos** (`RyfjEHnKbtma4Srae2za`), grave y cálida → para una serie de historias.
+  Descartadas: Tatiana (muy melódica), Martin Alvarez y Diego Cárdenas (rápidas y con eses marcadas).
 - **Audio, lo más importante**: ni el fondo puede tapar la voz ni la voz al fondo. Revisar siempre
   `output/<id>/informe_mezcla.txt` (objetivo: voz 10–14 dB sobre el fondo, peor 10 % > 7 dB;
   fondo en las pausas entre −6 y −10 dB; frases igualadas). Comprobar sonidos nuevos con espectrograma
