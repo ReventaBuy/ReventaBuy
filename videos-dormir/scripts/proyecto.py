@@ -89,6 +89,7 @@ VIDEOS = {
                        ("C", ["FLOTA…", "Y DUERME"], "método militar guiado")]),
         archivo="Metodo_militar_para_dormir_guiado_3h",
         crf_claro=22, audio_kbps=160,  # la escena comprime muy bien: se aprovecha para dar más calidad al audio
+        ducking_db=4.0,  # el chapoteo del agua es grave y compite con la voz: el fondo se aparta un poco más
     ),
 }
 
