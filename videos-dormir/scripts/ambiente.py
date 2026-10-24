@@ -211,6 +211,28 @@ def chimenea(segundos=600):
     return canales
 
 
+def lluvia_ventana(segundos=600):
+    """Lluvia oída desde dentro: lluvia amortiguada por el cristal, tejado, gotas en el cristal y el canalón."""
+    n = SR * segundos
+    env = envolvente_lenta(n, 0.15, [3, 7, 13, 29])
+    canales = []
+    for _ in range(2):
+        fuera = ruido_con_espectro(n, [20, 60, 150, 400, 900, 1800, 3500, 7000, 24000],
+                                   [-30, -16, -8, -2, 0, -5, -16, -32, -70]) * env
+        tejado = ruido_con_espectro(n, [20, 50, 120, 300, 800, 24000], [-8, 0, -3, -12, -30, -80])
+        cristal = chasquidos(n, 9, env, 1.2, ([20, 600, 1500, 3000, 6000, 12000, 24000], [-60, -14, -3, 0, -8, -26, -60]), 0.6)
+        finas = chasquidos(n, 60, env, 0.5, ([20, 1500, 4000, 8000, 16000, 24000], [-60, -12, -4, -8, -24, -60]), 0.5)
+        canales.append(0.9 * fuera + 0.35 * tejado + 0.55 * cristal + 0.25 * finas)
+    # goteo del canalón en un charco: gotas con su "plic" (en una gota real el tono es natural)
+    canalon = gotas(n, 0.6, [kernel_plip(1000, 30), kernel_plip(1150, 25), kernel_plip(880, 35)], 0.25, 0.3)
+    salida = []
+    for y, g in zip(canales, canalon):
+        y = y + g
+        k = 6 * np.sqrt(np.mean(y ** 2))  # limitador suave de picos
+        salida.append(k * np.tanh(y / k))
+    return salida
+
+
 def nota(hz):
     return 440 * 2 ** ((hz - 69) / 12)  # hz aquí es número MIDI
 
@@ -264,6 +286,6 @@ def guardar(nombre, L, R, pico_db=-3.0):
 
 if __name__ == "__main__":
     OUT.mkdir(parents=True, exist_ok=True)
-    generador = {"lluvia": lluvia, "mar": mar, "chimenea": chimenea}[proyecto.CONF["ambiente"]]
+    generador = {"lluvia": lluvia, "mar": mar, "chimenea": chimenea, "lluvia_ventana": lluvia_ventana}[proyecto.CONF["ambiente"]]
     guardar("ambiente_loop.wav", *generador())
     guardar("pad_loop.wav", *pad(proyecto.CONF["acordes"]))

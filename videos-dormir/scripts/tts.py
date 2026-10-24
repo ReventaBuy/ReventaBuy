@@ -75,6 +75,22 @@ def cargar(ruta):
     return x[a:b]
 
 
+def nivel_voz(x):
+    """Nivel (dB) de las partes con voz de una frase: RMS de los tramos de 30 ms a menos de 25 dB del más fuerte."""
+    w = int(0.03 * SR)
+    rms = np.sqrt((x[:x.size // w * w].reshape(-1, w) ** 2).mean(1) + 1e-12)
+    db = 20 * np.log10(rms)
+    return 10 * np.log10((rms[db > db.max() - 25] ** 2).mean())
+
+
+def nivelar(x, objetivo=-20.0, max_cambio=6.0):
+    """Lleva la frase al nivel objetivo para que ninguna suene más fuerte o más floja que las demás."""
+    if x.size < SR * 0.1:
+        return x
+    g = np.clip(objetivo - nivel_voz(x), -max_cambio, max_cambio)
+    return x * np.float32(10 ** (g / 20))
+
+
 def pista(eventos, voz, salida):
     """Monta la voz con sus pausas. Devuelve (capitulos [(segundo, titulo)], duración)."""
     frases = guion.frases(eventos)
@@ -89,7 +105,7 @@ def pista(eventos, voz, salida):
             anterior = frases[i - 1] if i > 0 else None
             siguiente = frases[i + 1] if i + 1 < len(frases) else None
             print(f"  [{i + 1}/{len(frases)}] {valor[:60]}")
-            x = cargar(sintetizar(valor, voz, anterior, siguiente))
+            x = nivelar(cargar(sintetizar(valor, voz, anterior, siguiente)))
             trozos.append(x)
             t += x.size / SR
             i += 1

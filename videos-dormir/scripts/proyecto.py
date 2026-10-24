@@ -49,6 +49,16 @@ VIDEOS = {
         bucle_oscuro="fondo_sin_nieve.mp4",  # …y el resto de la noche está en calma (pesa mucho menos)
         crf_claro=28, audio_kbps=112,  # la nieve cayendo pesa mucho: así cabe en < 400 MB
     ),
+    "04": dict(
+        escena="fondo_ventana",  # ventana iluminada bajo la lluvia, con un gato en el alféizar
+        ambiente="lluvia_ventana",
+        # Mi mayor: Emaj7 – C#m7 – Amaj7 – Bsus2
+        acordes=[[40, 47, 51, 56, 59], [37, 49, 52, 56, 59], [33, 45, 52, 56, 61], [35, 47, 49, 54, 59]],
+        voz=VOZ_JHENNY,
+        capitulo_final="Lluvia para dormir (sin voz)",
+        miniatura=("CIERRA LOS OJOS", "y escucha la lluvia", ""),
+        archivo="Relajacion_profunda_para_dormir_lluvia_en_la_ventana_3h",
+    ),
 }
 
 ID = os.environ.get("VIDEO", "01")
