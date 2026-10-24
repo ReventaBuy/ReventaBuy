@@ -53,4 +53,5 @@ y, si quieres otra escena, crea `scripts/fondo_<nombre>.py` con `init()` y `foto
   Mejor ≤ 380 MB: en el iPhone el .zip del vídeo 4 (409 MB) no se descargaba y desde el PC sí; los de 315–360 MB
   sí bajaron en el móvil.
   Cuidado con lo que pesa al comprimir: la lluvia o nieve dibujadas y los parpadeos globales disparan el tamaño.
-- **Publicación**: máximo un vídeo al día; ritmo recomendado 2–3 por semana, a las 19:00 (hora de España).
+- **Publicación**: el dueño publica **uno al día**, a las 19:00 (hora de España). Hay que ir por delante:
+  con el plan Starter de ElevenLabs salen ~6 vídeos guiados al mes, así que se alternan con vídeos solo de ambiente (sin voz).
