@@ -3,7 +3,11 @@
 Cielo de invierno con estrellas y luna creciente, montañas y pinos nevados, humo que sale de la
 chimenea, la ventana con el fuego titilando y su luz sobre la nieve, y copos cayendo despacio.
 Todo lo que se mueve tiene un número entero de ciclos por bucle (ver fondo.py).
+
+Variable de entorno NIEVE: "1" nieva (por defecto), "0" no nieva, "parando" deja de nevar a lo largo del bucle.
 """
+import os
+
 import numpy as np
 from PIL import Image, ImageDraw, ImageFilter
 
@@ -192,10 +196,13 @@ def fotograma(i):
     img = img * (1 - nbd[..., None]) + NIEVE_BRILLO * 0.5 * nbd[..., None]
 
     # copos: lejanos pequeños y nítidos, cercanos grandes y desenfocados
+    modo = os.environ.get("NIEVE", "1")
+    cantidad = {"1": 1.0, "0": 0.0}.get(modo, 1 - float(smooth(0.05, 0.9, fase)))  # "parando": deja de nevar
     c = dn["copos"]
     for sel, des in ((c["z"] < 0.6, 0.6), (c["z"] >= 0.6, 1.6)):
-        a = capa_copos(c, fase, sel, des)
-        img = img * (1 - a) + COPO * a
+        if cantidad > 0:
+            a = capa_copos(c, fase, sel, des) * cantidad
+            img = img * (1 - a) + COPO * a
 
     img = img * e["viñeta"] + e["dither"]
     return (np.clip(img, 0, 1) * 255 + 0.5).astype(np.uint8)

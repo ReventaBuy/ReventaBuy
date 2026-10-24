@@ -5,7 +5,7 @@ También es el motor de render de todas las escenas: genera un bucle perfecto de
 vuelve exactamente al punto de partida.
 
     python3 scripts/fondo.py frame [n]  -> output/<vídeo>/fondo_frame.png (para revisar)
-    python3 scripts/fondo.py video      -> output/<vídeo>/fondo_loop.mp4
+    python3 scripts/fondo.py video [nombre.mp4]  -> output/<vídeo>/fondo_loop.mp4 (u otro nombre)
 """
 import importlib
 import subprocess
@@ -258,9 +258,10 @@ if __name__ == "__main__":
             rutas = pool.map(render_tramo, [(k, cortes[k], cortes[k + 1]) for k in range(trozos)])
         lista = OUT / "_tramos.txt"
         lista.write_text("".join(f"file '{r.name}'\n" for r in rutas))
+        salida = OUT / (sys.argv[2] if len(sys.argv) > 2 else "fondo_loop.mp4")
         subprocess.run(["ffmpeg", "-v", "error", "-y", "-f", "concat", "-safe", "0", "-i", str(lista), "-c", "copy",
-                        "-movflags", "+faststart", str(OUT / "fondo_loop.mp4")], check=True)
+                        "-movflags", "+faststart", str(salida)], check=True)
         for r in rutas:
             r.unlink()
         lista.unlink()
-        print("ok", OUT / "fondo_loop.mp4")
+        print("ok", salida)

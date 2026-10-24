@@ -21,8 +21,10 @@ import proyecto
 
 SR, LOOP = 48000, 120  # LOOP: duración del bucle de vídeo (s)
 # Calidad (CRF: más alto = más compresión). HEVC: 3 h caben en ~350 MB sin pérdida visible.
-CRF_CLARO, CRF_TRANSICION, CRF_OSCURO = 25, 27, 30
-AUDIO_KBPS = 128
+# Cada vídeo puede ajustarlos en proyecto.py si su escena pesa más (p. ej. con nieve cayendo).
+CRF_CLARO = proyecto.CONF.get("crf_claro", 25)
+CRF_TRANSICION, CRF_OSCURO = 27, 30
+AUDIO_KBPS = proyecto.CONF.get("audio_kbps", 128)
 OUT = proyecto.OUT
 VOZ_INICIO = 6.0
 LUFS = {"voz": -19.0, "ambiente_con_voz": -30.0, "ambiente_solo": -27.0, "pad": -33.0}
@@ -82,10 +84,10 @@ def audio(dur, voz_wav, salida):
     return fin_voz
 
 
-def variante(nombre, filtro, crf=20):
-    """Re-codifica el bucle aplicando un filtro (oscurecer, fundidos) con los mismos parámetros."""
+def variante(nombre, filtro, crf=20, bucle="fondo_loop.mp4"):
+    """Re-codifica un bucle aplicando un filtro (oscurecer, fundidos) con los mismos parámetros."""
     ruta = OUT / f"_fondo_{nombre}.mp4"
-    subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", str(OUT / "fondo_loop.mp4"), "-filter_complex", filtro,
+    subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", str(OUT / bucle), "-filter_complex", filtro,
                     *codec(crf), "-an", str(ruta)], check=True)
     return ruta
 
@@ -98,11 +100,16 @@ def video(dur, fin_voz, audio_m4a, salida):
     negro = f"color=black:s=1920x1080:r=24:d={LOOP},format=rgba"
     inicio = variante("inicio", "[0:v]fade=in:st=0:d=4", CRF_CLARO)
     clara = variante("clara", "[0:v]null", CRF_CLARO)
-    transicion = variante("transicion", f"{negro},fade=in:st=0:d={LOOP}:alpha=1,colorchannelmixer=aa={oscuro}[n];[0:v][n]overlay", CRF_TRANSICION)
+    # una escena puede tener bucles propios para el final (p. ej. deja de nevar y luego no nieva)
+    b_transicion = proyecto.CONF.get("bucle_transicion", "fondo_loop.mp4")
+    b_oscuro = proyecto.CONF.get("bucle_oscuro", "fondo_loop.mp4")
+    transicion = variante("transicion", f"{negro},fade=in:st=0:d={LOOP}:alpha=1,colorchannelmixer=aa={oscuro}[n];[0:v][n]overlay",
+                          CRF_TRANSICION, b_transicion)
     # la parte oscura casi nadie la mira: mucha más compresión, mucho menos peso
-    oscura = variante("oscura", f"{negro},colorchannelmixer=aa={oscuro}[n];[0:v][n]overlay", CRF_OSCURO)
+    oscura = variante("oscura", f"{negro},colorchannelmixer=aa={oscuro}[n];[0:v][n]overlay", CRF_OSCURO, b_oscuro)
     ultima = dur - (vueltas - 1) * LOOP
-    final = variante("final", f"{negro},colorchannelmixer=aa={oscuro}[n];[0:v][n]overlay,fade=out:st={max(0, ultima - 60)}:d=60", CRF_OSCURO)
+    final = variante("final", f"{negro},colorchannelmixer=aa={oscuro}[n];[0:v][n]overlay,fade=out:st={max(0, ultima - 60)}:d=60",
+                     CRF_OSCURO, b_oscuro)
     lista = [inicio] + [clara] * (claras - 1) + [transicion] + [oscura] * (vueltas - claras - 2) + [final]
     (OUT / "_lista.txt").write_text("".join(f"file '{r.name}'\n" for r in lista))
     subprocess.run(["ffmpeg", "-v", "error", "-y", "-f", "concat", "-safe", "0", "-i", str(OUT / "_lista.txt"),
