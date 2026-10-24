@@ -32,6 +32,9 @@ y, si quieres otra escena, crea `scripts/fondo_<nombre>.py` con `init()` y `foto
 ## Indicaciones del dueño del canal (para los próximos vídeos)
 
 - **Libertad completa**: tema, guion, escena y sonido los decide Claude, sin preguntar.
+- **La voz y el guion son lo más importante.** Los guiones deben tener calidad de psicólogo del sueño:
+  cada frase pensada para relajar y facilitar dormir cuanto antes. Seguir siempre `GUIA_GUION.md`
+  y pasar su lista de revisión antes de generar la voz.
 - **Voz**: se puede elegir otra voz de ElevenLabs o ir cambiándola de vez en cuando. Se pueden probar
   varias (gastando algunos créditos en muestras) y quedarse con la mejor. Hasta ahora: Jhenny
   (`D9MdulIxfrCUUJcGNQon`), latina, suave. Las voces de la biblioteca necesitan plan de pago (Starter).
