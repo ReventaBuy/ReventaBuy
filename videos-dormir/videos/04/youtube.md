@@ -26,7 +26,17 @@ Cierra los ojos y escucha la lluvia. Esta relajación profunda para dormir te gu
 • Cuando termina la voz, la imagen se oscurece sola para no molestarte.
 
 ⏱️ Capítulos
-CAPITULOS
+0:00 Bienvenida
+2:03 La lluvia en la ventana
+4:45 Respirar con la lluvia
+6:53 Cerrar el día
+8:31 El cuerpo pesa
+12:16 El cuerpo se calienta
+14:33 El jardín bajo la lluvia
+16:56 La escalera del sueño
+19:59 La habitación del sueño
+23:55 Hacia el sueño
+26:00 Lluvia para dormir (sin voz)
 
 🌙 Si te ayuda a descansar, suscríbete a Refugio del Sueño: cada semana, un nuevo refugio para dormir.
 

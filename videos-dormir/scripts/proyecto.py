@@ -64,7 +64,7 @@ VIDEOS = {
         archivo="Relajacion_profunda_para_dormir_lluvia_en_la_ventana_3h",
         bucle_transicion="fondo_amainando.mp4",  # al acabar la voz, la lluvia visible amaina (el sonido sigue)…
         bucle_oscuro="fondo_suave.mp4",  # …y en la parte oscura queda una llovizna ligera (pesa mucho menos)
-        crf_claro=27, audio_kbps=112,  # la lluvia en movimiento pesa mucho: así cabe en < 400 MB
+        crf_claro=28, crf_oscuro=34, audio_kbps=112,  # la lluvia en movimiento pesa mucho: así cabe en < 400 MB
     ),
 }
 

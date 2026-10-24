@@ -24,7 +24,8 @@ SR, LOOP = 48000, 120  # LOOP: duración del bucle de vídeo (s)
 # Calidad (CRF: más alto = más compresión). HEVC: 3 h caben en ~350 MB sin pérdida visible.
 # Cada vídeo puede ajustarlos en proyecto.py si su escena pesa más (p. ej. con nieve cayendo).
 CRF_CLARO = proyecto.CONF.get("crf_claro", 25)
-CRF_TRANSICION, CRF_OSCURO = 27, 30
+CRF_TRANSICION = 27
+CRF_OSCURO = proyecto.CONF.get("crf_oscuro", 30)
 AUDIO_KBPS = proyecto.CONF.get("audio_kbps", 128)
 OUT = proyecto.OUT
 VOZ_INICIO = 6.0
