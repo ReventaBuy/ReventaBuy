@@ -56,7 +56,11 @@ VIDEOS = {
         acordes=[[40, 47, 51, 56, 59], [37, 49, 52, 56, 59], [33, 45, 52, 56, 61], [35, 47, 49, 54, 59]],
         voz=VOZ_JHENNY,
         capitulo_final="Lluvia para dormir (sin voz)",
-        miniatura=("CIERRA LOS OJOS", "y escucha la lluvia", ""),
+        miniatura_impacto=dict(
+            recorte=(481, 182, 1741, 891), texto_ancho=470, frame=300,
+            variantes=[("A", ["CIERRA", "LOS OJOS"], "y escucha la lluvia"),
+                       ("B", ["TU CUERPO", "PESA…"], "relajación profunda · voz suave"),
+                       ("C", ["DUERME", "YA."], "con la lluvia en la ventana")]),
         archivo="Relajacion_profunda_para_dormir_lluvia_en_la_ventana_3h",
     ),
 }
