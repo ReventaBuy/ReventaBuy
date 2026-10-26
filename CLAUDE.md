@@ -13,6 +13,8 @@ Reglas:
   cuál de los dos quiere antes de hacer nada. No lo deduzcas por el tema.
 - **Usa solo las skills de ese tipo.** En un vídeo de Refugio del Sueño no se usa ninguna
   skill `ig-*`; en contenido de Instagram no se usa `video-dormir` ni su flujo.
+- **Pregunta qué voz quiere en cada vídeo**, de cualquiera de los dos tipos, antes de generar
+  ninguna voz. No la elijas tú ni repitas la del vídeo anterior sin preguntar.
 - **No se mezclan hasta que el usuario lo diga.** Solo si pide expresamente combinar los
   dos tipos (por ejemplo, sacar un Reel de un vídeo de Refugio del Sueño), y solo para ese
   encargo.

@@ -20,6 +20,11 @@ hay que leerlas enteras antes de empezar:
 - `videos-dormir/GUIA_GUION.md`: cómo se escribe el guion, con su lista de
   revisión, que se pasa siempre antes de generar la voz.
 
+## Voz
+
+Antes de generar la voz, pregunta siempre al usuario qué voz quiere para este
+vídeo (Jhenny, Juan Carlos, Tony u otra). No la elijas tú.
+
 ## Sin mezclar con Instagram
 
 Este tipo no usa ninguna skill `ig-*` (ni `ig-human`, ni `ig-caption`, ni
