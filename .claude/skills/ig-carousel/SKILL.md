@@ -1,6 +1,9 @@
 ---
 name: ig-carousel
 description: >-
+  [Tipo INSTAGRAM] Úsala solo cuando el usuario haya elegido el tipo
+  Instagram; nunca en un vídeo de Refugio del Sueño (videos-dormir) salvo
+  que el usuario pida expresamente mezclar los dos tipos.
   Build an Instagram carousel - the cover that earns the swipe, slide-by-slide
   copy, and the 1080x1350 files to upload. Use when the user says "carousel",
   "slides", "swipe post", "turn this into a carousel", or has a list-shaped or

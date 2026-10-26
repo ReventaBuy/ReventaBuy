@@ -1,6 +1,9 @@
 ---
 name: ig-caption
 description: >-
+  [Tipo INSTAGRAM] Úsala solo cuando el usuario haya elegido el tipo
+  Instagram; nunca en un vídeo de Refugio del Sueño (videos-dormir) salvo
+  que el usuario pida expresamente mezclar los dos tipos.
   Write the Instagram caption - the line that survives the "... more" cut, the
   body, the single ask, the search terms and the three hashtags - and lint it
   before it goes out. Use when the user says "write the caption", "caption this",

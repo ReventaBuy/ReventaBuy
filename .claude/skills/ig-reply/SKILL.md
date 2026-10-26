@@ -1,6 +1,9 @@
 ---
 name: ig-reply
 description: >-
+  [Tipo INSTAGRAM] Úsala solo cuando el usuario haya elegido el tipo
+  Instagram; nunca en un vídeo de Refugio del Sueño (videos-dormir) salvo
+  que el usuario pida expresamente mezclar los dos tipos.
   Handle the comments under the user's own reels and posts - draft replies to
   the ones worth answering, sorted by which ones are. Use when the user pastes
   their comments, says "reply to these", "handle my comments", "someone said X

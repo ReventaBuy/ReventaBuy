@@ -1,6 +1,9 @@
 ---
 name: ig-reel
 description: >-
+  [Tipo INSTAGRAM] Úsala solo cuando el usuario haya elegido el tipo
+  Instagram; nunca en un vídeo de Refugio del Sueño (videos-dormir) salvo
+  que el usuario pida expresamente mezclar los dos tipos.
   Write an Instagram Reel from a raw idea - hook options off 26 formulas, the
   spoken script, the on-screen text, and a timed beat sheet - in the user's own
   voice and scored before they shoot it. Use whenever the user wants a Reel, a
@@ -24,7 +27,7 @@ python3 beats.py script.txt --target 30     # timed beat sheet before you shoot
 
 ## Before you write
 
-1. Read `~/.claude/instagram/voice.md` if it exists. That is the user's voice
+1. Read `instagram/voice.md` if it exists. That is the user's voice
    profile: how they talk on camera, what they never say, who they are talking
    to. If it does not exist, ask for **three of their own reels**, transcribe or
    read them, infer the voice, and write the file. A script in the wrong voice
@@ -36,7 +39,7 @@ python3 beats.py script.txt --target 30     # timed beat sheet before you shoot
 3. If the idea is thin, do not pad it. Ask one batched question: what happened,
    to whom, and what did it cost or return. A Reel needs one specific true
    thing. Get it before writing.
-4. If `~/.claude/instagram/swipe.md` exists, read it. `/ig-viral` writes that
+4. If `instagram/swipe.md` exists, read it. `/ig-viral` writes that
    file, and it is the user's own evidence about which formulas are working in
    their niche right now. It beats the defaults in this file.
 
@@ -93,7 +96,7 @@ Reply "yes" to log it, or tell me what to change.
 ```
 
 **7. Never publish.** This skill produces a script. The user shoots it and
-posts it. On "yes", append to `~/.claude/instagram/log.md` with the date, the
+posts it. On "yes", append to `instagram/log.md` with the date, the
 hook formula used and the first line, so `/ig-audit` has a history later.
 
 ## On-screen text is a separate script

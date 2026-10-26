@@ -1,6 +1,9 @@
 ---
 name: ig-comment
 description: >-
+  [Tipo INSTAGRAM] Úsala solo cuando el usuario haya elegido el tipo
+  Instagram; nunca en un vídeo de Refugio del Sueño (videos-dormir) salvo
+  que el usuario pida expresamente mezclar los dos tipos.
   Write comments on other people's Instagram posts and reels that read as a
   person with an opinion, not a bot. Use when the user pastes a post or a reel
   and wants a comment, says "comment on this", "engage with this", "what do I
@@ -82,7 +85,7 @@ Post the first. It concedes something and it has a number in it.
 
 For an engagement round, ask for the 5 to 10 posts as pasted text in one
 message, return one comment each in a single block, and keep a running note in
-`~/.claude/instagram/log.md` of who has been commented on this week.
+`instagram/log.md` of who has been commented on this week.
 Commenting on the same three accounts every day is visible and it looks like
 exactly what it is.
 

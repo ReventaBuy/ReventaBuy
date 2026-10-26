@@ -1,6 +1,9 @@
 ---
 name: ig-human
 description: >-
+  [Tipo INSTAGRAM] Úsala solo cuando el usuario haya elegido el tipo
+  Instagram; nunca en un vídeo de Refugio del Sueño (videos-dormir) salvo
+  que el usuario pida expresamente mezclar los dos tipos.
   Strip the machine fingerprint out of any draft - em dashes, AI slop words,
   invisible watermark characters - and score it against a five-check detection
   panel before it goes out. Use whenever text needs to sound human, when the

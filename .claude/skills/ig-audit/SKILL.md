@@ -1,6 +1,9 @@
 ---
 name: ig-audit
 description: >-
+  [Tipo INSTAGRAM] Úsala solo cuando el usuario haya elegido el tipo
+  Instagram; nunca en un vídeo de Refugio del Sueño (videos-dormir) salvo
+  que el usuario pida expresamente mezclar los dos tipos.
   Post-mortem on what the user has already posted - which reels actually
   worked, why, and what to stop making. Use when the user pastes their
   Instagram insights or past posts and asks "what's working", "why did this
@@ -24,7 +27,7 @@ Ask for whichever the user has:
   screenshot is worth more than the rest combined.
 - Or just the posts and their view counts, which is enough for a first pass.
 
-Also read `~/.claude/instagram/log.md` if it exists, since it records which
+Also read `instagram/log.md` if it exists, since it records which
 hook formula each post used.
 
 ## What to actually measure

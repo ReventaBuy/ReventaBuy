@@ -1,6 +1,9 @@
 ---
 name: ig-profile
 description: >-
+  [Tipo INSTAGRAM] Úsala solo cuando el usuario haya elegido el tipo
+  Instagram; nunca en un vídeo de Refugio del Sueño (videos-dormir) salvo
+  que el usuario pida expresamente mezclar los dos tipos.
   Score an Instagram profile out of 100 against a 12-part rubric and rewrite
   the parts that lose points - name field, bio, link, highlights, pinned three,
   grid. Use when the user says "optimize my profile", "fix my bio", "score my

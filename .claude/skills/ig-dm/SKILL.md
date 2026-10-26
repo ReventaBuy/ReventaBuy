@@ -1,6 +1,9 @@
 ---
 name: ig-dm
 description: >-
+  [Tipo INSTAGRAM] Úsala solo cuando el usuario haya elegido el tipo
+  Instagram; nunca en un vídeo de Refugio del Sueño (videos-dormir) salvo
+  que el usuario pida expresamente mezclar los dos tipos.
   Write Instagram DMs that get replies - the keyword delivery, the first
   message to someone who engaged, the collab pitch, and the two follow-ups. Use
   when the user says "DM this person", "what do I send them", "outreach

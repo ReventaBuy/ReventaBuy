@@ -1,6 +1,9 @@
 ---
 name: ig-story
 description: >-
+  [Tipo INSTAGRAM] Úsala solo cuando el usuario haya elegido el tipo
+  Instagram; nunca en un vídeo de Refugio del Sueño (videos-dormir) salvo
+  que el usuario pida expresamente mezclar los dos tipos.
   Write the day's Instagram Stories - the frame-by-frame sequence, which
   stickers to use where, and the one that moves people into the DMs. Use when
   the user says "stories", "what do I post on my story", "story sequence",

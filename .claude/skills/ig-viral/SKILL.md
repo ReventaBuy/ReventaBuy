@@ -1,6 +1,9 @@
 ---
 name: ig-viral
 description: >-
+  [Tipo INSTAGRAM] Úsala solo cuando el usuario haya elegido el tipo
+  Instagram; nunca en un vídeo de Refugio del Sueño (videos-dormir) salvo
+  que el usuario pida expresamente mezclar los dos tipos.
   Go and find the reels that are actually working right now in the user's
   niche, rank them by how far each beat its own account, name the hook formula
   each one used, and turn that into a swipe file they can shoot from. Use when
@@ -18,7 +21,7 @@ looks. Run it monthly, not daily. Formulas last a season.
 One tool lives in this folder and it runs:
 
 ```bash
-python3 swipe.py captured.tsv --out ~/.claude/instagram/swipe.md
+python3 swipe.py captured.tsv --out instagram/swipe.md
 ```
 
 ## The one idea that makes this worth doing
@@ -112,7 +115,7 @@ account	followers	median	views	hook
 ```
 
 ```bash
-python3 swipe.py captured.tsv --out ~/.claude/instagram/swipe.md
+python3 swipe.py captured.tsv --out instagram/swipe.md
 ```
 
 It computes the outlier multiple, names the hook formula using the same 26
@@ -171,7 +174,7 @@ YOUR VERSION
   ...
 ```
 
-Write the swipe file to `~/.claude/instagram/swipe.md`. `/ig-reel` and
+Write the swipe file to `instagram/swipe.md`. `/ig-reel` and
 `/ig-plan` both read it, which is the point: after this runs once, the rest of
 the pack is working from the user's own evidence instead of from defaults.
 

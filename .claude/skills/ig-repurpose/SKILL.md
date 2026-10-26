@@ -1,6 +1,9 @@
 ---
 name: ig-repurpose
 description: >-
+  [Tipo INSTAGRAM] Úsala solo cuando el usuario haya elegido el tipo
+  Instagram; nunca en un vídeo de Refugio del Sueño (videos-dormir) salvo
+  que el usuario pida expresamente mezclar los dos tipos.
   Turn one long asset - a YouTube video, podcast, livestream, newsletter, blog
   post or client call - into a week of reels and carousels. Use when the user
   says "repurpose this", "turn this into reels", "I have a video/podcast/
