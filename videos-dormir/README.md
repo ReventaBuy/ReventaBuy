@@ -36,8 +36,9 @@ y, si quieres otra escena, crea `scripts/fondo_<nombre>.py` con `init()` y `foto
 - **La voz y el guion son lo más importante.** Los guiones deben tener calidad de psicólogo del sueño:
   cada frase pensada para relajar y facilitar dormir cuanto antes. Seguir siempre `GUIA_GUION.md`
   y pasar su lista de revisión antes de generar la voz.
-- **Voz**: se puede elegir otra voz de ElevenLabs o ir cambiándola de vez en cuando. Se pueden probar
-  varias (gastando algunos créditos en muestras) y quedarse con la mejor (`scripts/casting.py`).
+- **Voz: preguntar siempre al dueño qué voz quiere en cada vídeo**, antes de generarla. No se elige
+  por él. Opciones: Jhenny, Juan Carlos, Tony (falta su voice ID de ElevenLabs) o cualquier otra que diga.
+  Si lo pide, se pueden probar varias (gastando algunos créditos en muestras) con `scripts/casting.py`.
   Casting del vídeo 05 (mismo fragmento): **Jhenny** (`D9MdulIxfrCUUJcGNQon`) es la que más relaja
   (la más pausada, tono más estable, más cálida, menos eses) → voz principal del canal. Mejor voz
   masculina: **Juan Carlos** (`RyfjEHnKbtma4Srae2za`), grave y cálida → para una serie de historias.
